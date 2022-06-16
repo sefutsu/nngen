@@ -26,7 +26,7 @@ from .storage import *
 from .dtype_list import *
 from .operator import *
 from .util import *
-from .eval import eval
+from .eval import eval, gradient
 from .onnx import from_onnx
 from .quantizer import quantize
 

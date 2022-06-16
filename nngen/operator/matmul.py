@@ -327,7 +327,30 @@ class matmul(conv2d.conv2d):
         kwargs['scale_dtype'] = self.args[self.args_dict['scale']].dtype if self.has_scale else None
 
         method = self.get_eval_method()
-        ret = method(input, filter, **kwargs)
+        ret = method(input, filter, stored_input=self.stored_input, **kwargs)
         memo[id(self)] = ret
 
         return ret
+
+    def gradient(self, input_var, propagated_gradient, **kwargs):
+        if self is input_var: return propagated_gradient
+        
+        input = self.args[0]
+        filter = self.args[1]
+
+        filter_value = filter.eval({}, {})
+
+        import nngen.verify as verify
+
+        if self.act_func is not None:
+            act_deriv_method = self.act_func.get_derivative_method()
+            activation_term = act_deriv_method(self.stored_input["activated_value"])
+            propagated_gradient = propagated_gradient * activation_term
+
+        propagated_gradient = verify.matmul(propagated_gradient, filter_value,
+                                            bias=None,
+                                            transposed_a=False,
+                                            transposed_b=not self.transposed_b
+        )
+
+        return input.gradient(input_var, propagated_gradient, **kwargs)

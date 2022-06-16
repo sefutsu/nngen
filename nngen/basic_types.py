@@ -341,6 +341,11 @@ class _Storage(_Numeric):
 
         return _Numeric.eval(self, memo, input_dict, **kwargs)
 
+    def gradient(self, input_var, propagated_gradient, **kwargs):
+        if self is input_var:
+            return propagated_gradient
+
+        raise NotImplementedError("Storage.gradient")
 
 class _Constant(_Storage):
 
@@ -431,6 +436,8 @@ class _Operator(_Numeric):
         self.cached_ram_set = False
         self.cached_stream = False
         self.cached_control = False
+
+        self.stored_input = {}
 
     def attribute(self, par=None):
         if par is not None:
