@@ -346,7 +346,7 @@ class matmul(conv2d.conv2d):
         if self.act_func is not None:
             act_deriv_method = self.act_func.get_derivative_method()
             activation_term = act_deriv_method(self.stored_input["activated_value"])
-            propagated_gradient = propagated_gradient * activation_term
+            propagated_gradient = verify.multiply(propagated_gradient, activation_term)
 
         propagated_gradient = verify.matmul(propagated_gradient, filter_value,
                                             bias=None,
