@@ -325,16 +325,17 @@ class matmul(conv2d.conv2d):
         kwargs['b_dtype'] = self.args[1].dtype
         kwargs['bias_dtype'] = self.args[self.args_dict['bias']].dtype if self.has_bias else None
         kwargs['scale_dtype'] = self.args[self.args_dict['scale']].dtype if self.has_scale else None
+        kwargs['stored_input'] = self.stored_input
 
         method = self.get_eval_method()
-        ret = method(input, filter, stored_input=self.stored_input, **kwargs)
+        ret = method(input, filter, **kwargs)
         memo[id(self)] = ret
 
         return ret
 
     def gradient(self, input_var, propagated_gradient, **kwargs):
         if self is input_var: return propagated_gradient
-        
+
         input = self.args[0]
         filter = self.args[1]
 
