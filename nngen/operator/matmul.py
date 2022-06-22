@@ -341,17 +341,15 @@ class matmul(conv2d.conv2d):
 
         filter_value = filter.eval({}, {})
 
-        import nngen.verify as verify
+        import nngen.verify.derivative as deriv
 
-        if self.act_func is not None:
-            act_deriv_method = self.act_func.get_derivative_method()
-            activation_term = act_deriv_method(self.stored_input["activated_value"])
-            propagated_gradient = verify.multiply(propagated_gradient, activation_term)
-
-        propagated_gradient = verify.matmul(propagated_gradient, filter_value,
-                                            bias=None,
-                                            transposed_a=False,
-                                            transposed_b=not self.transposed_b
+        propagated_gradient = deriv.matmul(propagated_gradient, None, filter_value, 
+            deriv_by_a=True,
+            stored_input=self.stored_input,
+            transposed_a=self.transposed_a,
+            transposed_b=self.transposed_b,
+            a_dtype=self.args[0].dtype, b_dtype=self.args[1].dtype,
+            act_func=self.act_func
         )
 
         return input.gradient(input_var, propagated_gradient, **kwargs)

@@ -3,3 +3,4 @@ from __future__ import print_function
 from __future__ import division
 
 from .relu import relu
+from .matmul import matmul
