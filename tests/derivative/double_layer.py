@@ -34,9 +34,8 @@ b1.set_value(b1_value)
 
 input_value = np.array([[-2, 2, -1], [-1, -1, 1]], dtype=np.int64)
 
-ng.eval([s1], input_layer=input_value)
+eval_res = ng.eval([s1], input_layer=input_value)
 res = ng.gradient(s1, input_layer)
-
 
 ### torch.autograd
 
@@ -53,6 +52,7 @@ s1 = torch.relu(s0 @ w1.T + b1)
 s = s1.sum()
 
 s.backward()
+
 torch_res = input_value.grad.numpy()
 
 if (abs(res - torch_res) < 1e-5).all():

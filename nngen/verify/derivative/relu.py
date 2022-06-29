@@ -9,7 +9,7 @@ def relu(propagated_gradient, features, dtype=None,
 
     out_point = 0 if dtype is None else dtype.point
 
-    comp = features >= 0
+    comp = features > 0
 
     zeros = np.zeros_like(features, dtype=np.int64)
     ones = np.ones_like(features, dtype=np.int64) << out_point

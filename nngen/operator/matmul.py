@@ -333,7 +333,7 @@ class matmul(conv2d.conv2d):
 
         return ret
 
-    def gradient(self, input_var, propagated_gradient, dtype=None, **kwargs):
+    def gradient(self, input_var, propagated_gradient, dtype=None):
         if self is input_var: return propagated_gradient
 
         input = self.args[0]
@@ -361,7 +361,6 @@ class matmul(conv2d.conv2d):
             rshift_mul=rshift_mul, rshift_sum=rshift_sum, rshift_out=rshift_out,
             a_dtype=self.args[0].dtype, b_dtype=self.args[1].dtype,
             pg_dtype=dtype,
-            act_func=self.act_func,
-            **kwargs)
+            act_func=self.act_func)
 
-        return input.gradient(input_var, propagated_gradient, **kwargs)
+        return input.gradient(input_var, propagated_gradient)
