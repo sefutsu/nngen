@@ -14,7 +14,7 @@ def multiply(a, b,
     c_point = max(a_point, b_point) if dtype is None else dtype.point
     c_width = 32 if dtype is None else dtype.width
 
-    c = a.astype(np.int64) * b.astype(np.int64)
+    c = a * b
     c_rshift = a_point + b_point - c_point
     if c_rshift > 0:
         c >> c_rshift
