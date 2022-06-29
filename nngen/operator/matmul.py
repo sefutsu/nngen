@@ -333,13 +333,23 @@ class matmul(conv2d.conv2d):
 
         return ret
 
-    def gradient(self, input_var, propagated_gradient, **kwargs):
+    def gradient(self, input_var, propagated_gradient, dtype=None, **kwargs):
         if self is input_var: return propagated_gradient
 
         input = self.args[0]
-        filter = self.args[1]
 
-        filter_value = filter.eval({}, {})
+        args = [None] + [arg.eval({}, {}) for arg in self.args[1:]]
+        filter_value = args[1]
+
+        scale = args[self.args_dict['scale']] if self.has_scale else None
+        scale_dtype = self.args[self.args_dict['scale']].dtype if self.has_scale else None
+
+        rshift_mul = (args[self.args_dict['vshamt_mul']]
+                      if self.has_vshamt_mul else self.cshamt_mul)
+        rshift_sum = (args[self.args_dict['vshamt_sum']]
+                      if self.has_vshamt_sum else self.cshamt_sum)
+        rshift_out = (args[self.args_dict['vshamt_out']]
+                      if self.has_vshamt_out else self.cshamt_out)
 
         import nngen.verify.derivative as deriv
 
@@ -348,7 +358,10 @@ class matmul(conv2d.conv2d):
             stored_input=self.stored_input,
             transposed_a=self.transposed_a,
             transposed_b=self.transposed_b,
+            scale=scale, scale_dtype=scale_dtype,
+            rshift_mul=rshift_mul, rshift_sum=rshift_sum, rshift_out=rshift_out,
             a_dtype=self.args[0].dtype, b_dtype=self.args[1].dtype,
+            pg_dtype=dtype,
             act_func=self.act_func
         )
 

@@ -114,7 +114,8 @@ def matmul(propagated_gradient, a, b, deriv_by_a=True,
     scl_point = max(pg_point, scale_point)
     scl_shift = min(pg_point, scl_point)
     shifted_scale = np.right_shift(scale, scl_shift)
-    propagated_gradient *= shifted_scale
+
+    propagated_gradient = propagated_gradient * shifted_scale[None]
 
     propagated_gradient += rshift_sum_round
     propagated_gradient >>= rshift_sum

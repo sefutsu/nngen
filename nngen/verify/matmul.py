@@ -182,9 +182,6 @@ def matmul(a, b, stored_input=None,
     sum = np.add(sum, rshift_sum_round)
     sum = np.right_shift(sum, rshift_sum)
 
-    if stored_input is not None:
-        stored_input["activated_value"] = sum[:]
-
     sum = np.add(sum, shifted_bias)
     sum = np.multiply(sum, shifted_scale)
     frac = np.where(rshift_out!=0, np.where(sum>=0, rshift_out_round, rshift_out_round - 1),
@@ -192,6 +189,9 @@ def matmul(a, b, stored_input=None,
     sum = np.add(sum,frac)
     sum = np.right_shift(sum, rshift_out)
     sum = np.where(sum > p_th, p_th, np.where(sum < n_th, n_th, sum))
+
+    if stored_input is not None:
+        stored_input["activated_value"] = sum[:]
 
     c = act_op(sum)
 

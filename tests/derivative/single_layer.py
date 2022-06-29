@@ -15,19 +15,22 @@ dtype = ng.int64
 input_layer = ng.placeholder(dtype=dtype, shape=(2, 3), name="input_layer")
 w0 = ng.variable(dtype=dtype, shape=(2, 3), name="w0")
 b0 = ng.variable(dtype=dtype, shape=(2,), name="b0")
-s0 = ng.matmul(input_layer, w0, bias=b0, transposed_b=True, act_func=ng.relu, dtype=dtype)
+scale = ng.variable(dtype=dtype, shape=(2,), name="scale")
+s0 = ng.matmul(input_layer, w0, bias=b0, scale=scale, transposed_b=True, act_func=ng.relu, dtype=dtype)
 
-w0_value = np.array([[1, 2, 1], [2, 1, 1]], dtype=np.int64)
+w0_value = np.random.randint(-100, 100, size=(2, 3), dtype=np.int64)
 w0.set_value(w0_value)
 
-b0_value = np.array([1, 2], dtype=np.int64)
+b0_value = np.random.randint(-100, 100, size=(1, 2), dtype=np.int64)
 b0.set_value(b0_value)
 
-input_value = np.array([[-2, 2, -1], [-1, -1, 1]], dtype=np.int64)
+scale_value = np.random.randint(-100, 100, size=(2,), dtype=np.int64)
+scale.set_value(scale_value)
 
-ng.eval([s0], input_layer=input_value)
+input_value = np.random.randint(-100, 100, size=(2, 3), dtype=np.int64)
+
+eval_res = ng.eval([s0], input_layer=input_value)
 res = ng.gradient(s0, input_layer)
-
 
 ### torch.autograd
 
@@ -36,9 +39,12 @@ dtype = torch.double
 input_value = torch.tensor(input_value, dtype=dtype, requires_grad=True)
 w0 = torch.tensor(w0_value, dtype=dtype)
 b0 = torch.tensor(b0_value, dtype=dtype)
+scale = torch.tensor(scale_value, dtype=dtype)
 
 a = input_value @ w0.T + b0
-h = torch.relu(a)
+k = a * scale
+h = torch.relu(k)
+# k.retain_grad()
 s = h.sum()
 
 s.backward()
