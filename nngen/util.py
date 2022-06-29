@@ -223,3 +223,9 @@ def clip_threshold(width, signed, asymmetric_clip=False):
         n_th = 0
 
     return p_th, n_th
+
+import decimal
+def divide(x, y):
+    if isinstance(x, (int, np.int64)):
+        return decimal.Decimal(str(x/y)).quantize(decimal.Decimal('0'),           rounding=decimal.ROUND_HALF_UP)
+    return np.array(list(map(lambda i: divide(i, y), x)), dtype=np.int64)

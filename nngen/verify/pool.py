@@ -9,7 +9,7 @@ from decimal import Decimal, ROUND_HALF_UP, ROUND_HALF_EVEN
 import nngen.util as util
 
 
-def avg_pool(value, ksize, stride, padding='SAME',
+def avg_pool(value, ksize, stride, padding='SAME', stored_input=None,
              dtype=None, sum_dtype=None, name=None, par=1,
              force_div=False,
              value_ram_size=None, out_ram_size=None,
@@ -64,6 +64,11 @@ def avg_pool(value, ksize, stride, padding='SAME',
 
     else:
         raise ValueError("padding options must be 'SAME', 'VALID', int, tuple, or list.")
+
+    if stored_input is not None:
+        stored_input["input_shape"] = value.shape
+        stored_input["padding"] = (pad_row_top, pad_col_right, 
+                                    pad_row_bottom, pad_col_left)
 
     out = np.zeros(out_shape, dtype=np.int64)
 
