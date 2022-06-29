@@ -43,10 +43,6 @@ class relu(bt._ActFuncOperator):
                                    features_dtype=self.args[0].dtype)
         return method
 
-    def get_derivative_method(self):
-        import nngen.verify.derivative as deriv
-        return deriv.relu
-
 
 class relu6(relu):
     """

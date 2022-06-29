@@ -75,7 +75,7 @@ def matmul(propagated_gradient, a, b, deriv_by_a=True,
             activated_value = stored_input["activated_value"]
         except KeyError:
             raise ValueError("No input value of activation function")
-        act_deriv_method = act_func.get_derivative_method()
+        act_deriv_method = act_func.get_deriv_method()
         propagated_gradient = act_deriv_method(propagated_gradient, activated_value)
 
 

@@ -1144,6 +1144,13 @@ class _Operator(_Numeric):
         method = getattr(verify, name, None)
         return method
 
+    def get_deriv_method(self):
+        import nngen.verify.derivative as deriv
+
+        name = self.__class__.__name__
+        method = getattr(deriv, name, None)
+        return method
+
     def get_max_arg_rank(self):
         max_rank = max(list(self.shared_attrs['_rank'].values()))
         return max_rank

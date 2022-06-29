@@ -339,7 +339,6 @@ class matmul(conv2d.conv2d):
         input = self.args[0]
 
         args = [None] + [arg.eval({}, {}) for arg in self.args[1:]]
-        filter_value = args[1]
 
         scale = args[self.args_dict['scale']] if self.has_scale else None
         scale_dtype = self.args[self.args_dict['scale']].dtype if self.has_scale else None
@@ -351,9 +350,9 @@ class matmul(conv2d.conv2d):
         rshift_out = (args[self.args_dict['vshamt_out']]
                       if self.has_vshamt_out else self.cshamt_out)
 
-        import nngen.verify.derivative as deriv
 
-        propagated_gradient = deriv.matmul(propagated_gradient, None, filter_value, 
+        method = self.get_deriv_method()
+        propagated_gradient = method(propagated_gradient, args[0], args[1], 
             deriv_by_a=True,
             stored_input=self.stored_input,
             transposed_a=self.transposed_a,
@@ -362,7 +361,7 @@ class matmul(conv2d.conv2d):
             rshift_mul=rshift_mul, rshift_sum=rshift_sum, rshift_out=rshift_out,
             a_dtype=self.args[0].dtype, b_dtype=self.args[1].dtype,
             pg_dtype=dtype,
-            act_func=self.act_func
-        )
+            act_func=self.act_func,
+            **kwargs)
 
         return input.gradient(input_var, propagated_gradient, **kwargs)
