@@ -12,7 +12,7 @@ import torch
 ### nngen.verify
 
 dtype = ng.int64
-input_layer = ng.placeholder(dtype=dtype, shape=(2, 3), name="input_layer")
+input_layer = ng.placeholder(dtype=dtype, shape=(1, 3), name="input_layer")
 w0 = ng.variable(dtype=dtype, shape=(2, 3), name="w0")
 b0 = ng.variable(dtype=dtype, shape=(2,), name="b0")
 scale = ng.variable(dtype=dtype, shape=(2,), name="scale")
@@ -27,7 +27,7 @@ b0.set_value(b0_value)
 scale_value = np.random.randint(-100, 100, size=(2,), dtype=np.int64)
 scale.set_value(scale_value)
 
-input_value = np.random.randint(-100, 100, size=(2, 3), dtype=np.int64)
+input_value = np.random.randint(-100, 100, size=(1, 3), dtype=np.int64)
 
 eval_res = ng.eval([s0], input_layer=input_value)
 res = ng.gradient(s0, input_layer)

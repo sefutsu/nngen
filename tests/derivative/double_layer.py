@@ -16,23 +16,30 @@ dtype = ng.int64
 input_layer = ng.placeholder(dtype=dtype, shape=(2, 3), name="input_layer")
 w0 = ng.variable(dtype=dtype, shape=(2, 3), name="w0")
 b0 = ng.variable(dtype=dtype, shape=(2,), name="b0")
-s0 = ng.matmul(input_layer, w0, bias=b0, transposed_b=True, act_func=ng.relu, dtype=dtype)
+scale0 = ng.variable(dtype=dtype, shape=(2,), name="scale0")
+s0 = ng.matmul(input_layer, w0, bias=b0, transposed_b=True, scale=scale0, act_func=ng.relu, dtype=dtype)
 
 w1 = ng.variable(dtype=dtype, shape=(3, 2), name="w1")
 b1 = ng.variable(dtype=dtype, shape=(3,), name="b1")
-s1 = ng.matmul(s0, w1, bias=b1, transposed_b=True, act_func=ng.relu, dtype=dtype)
+scale1 = ng.variable(dtype=dtype, shape=(3,), name="scale1")
+s1 = ng.matmul(s0, w1, bias=b1, transposed_b=True, scale=scale1, act_func=ng.relu, dtype=dtype)
 
-w0_value = np.array([[1, 2, 1], [2, 1, 1]], dtype=np.int64)
-w1_value = w0_value.T
+w0_value = np.random.randint(-100, 100, size=(2, 3), dtype=np.int64)
+w1_value = np.random.randint(-100, 100, size=(3, 2), dtype=np.int64)
 w0.set_value(w0_value)
 w1.set_value(w1_value)
 
-b0_value = np.array([1, 2], dtype=np.int64)
-b1_value = np.array([1, 2, -1], dtype=np.int64)
+b0_value = np.random.randint(-100, 100, size=(2,), dtype=np.int64)
+b1_value = np.random.randint(-100, 100, size=(3,), dtype=np.int64)
 b0.set_value(b0_value)
 b1.set_value(b1_value)
 
-input_value = np.array([[-2, 2, -1], [-1, -1, 1]], dtype=np.int64)
+scale0_value = np.random.randint(0, 100, size=(2,), dtype=np.int64)
+scale1_value = np.random.randint(0, 100, size=(3,), dtype=np.int64)
+scale0.set_value(scale0_value)
+scale1.set_value(scale1_value)
+
+input_value = np.random.randint(-100, 100, size=(2, 3), dtype=np.int64)
 
 eval_res = ng.eval([s1], input_layer=input_value)
 res = ng.gradient(s1, input_layer)
