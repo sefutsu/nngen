@@ -58,5 +58,11 @@ def avg_pool(propagated_gradient, ksize, strides, padding=None, stored_input=Non
 
     res = divide(res, ksize[0] * ksize[1])
 
+    pg_point = 0 if pg_dtype is None else pg_dtype.point
+    res_point = pg_point if dtype is None else dtype.point
+    lshift = res_point - pg_point
+
+    res = res << lshift if lshift > 0 else res >> (-lshift)
+
     return res
     
