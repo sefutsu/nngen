@@ -53,9 +53,11 @@ w0 = torch.tensor(w0_value, dtype=dtype)
 b0 = torch.tensor(b0_value, dtype=dtype)
 w1 = torch.tensor(w1_value, dtype=dtype)
 b1 = torch.tensor(b1_value, dtype=dtype)
+scale0 = torch.tensor(scale0_value, dtype=dtype)
+scale1 = torch.tensor(scale1_value, dtype=dtype)
 
-s0 = torch.relu(input_value @ w0.T + b0)
-s1 = torch.relu(s0 @ w1.T + b1)
+s0 = torch.relu((input_value @ w0.T + b0) * scale0)
+s1 = torch.relu((s0 @ w1.T + b1) * scale1)
 s = s1.sum()
 
 s.backward()
