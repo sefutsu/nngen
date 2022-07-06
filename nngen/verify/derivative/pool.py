@@ -38,7 +38,6 @@ def avg_pool(propagated_gradient, ksize, strides, padding=None, stored_input=Non
     output_shape = propagated_gradient.shape
 
     res = np.zeros(input_shape, dtype=np.int64)
-    print(input_shape, output_shape)
 
     for n in range(input_shape[0]):
         for k in range(input_shape[3]):
