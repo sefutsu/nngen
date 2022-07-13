@@ -328,6 +328,11 @@ class _Numeric(_Node):
 
         return self.value
 
+    def gradient(self, input_var, propagated_gradient, **kwargs):
+        if self is input_var:
+            return propagated_gradient
+        return None
+
 
 class _Storage(_Numeric):
 
@@ -340,12 +345,6 @@ class _Storage(_Numeric):
             return input_dict[self.name]
 
         return _Numeric.eval(self, memo, input_dict, **kwargs)
-
-    def gradient(self, input_var, propagated_gradient, **kwargs):
-        if self is input_var:
-            return propagated_gradient
-
-        raise NotImplementedError("Storage.gradient")
 
 class _Constant(_Storage):
 
