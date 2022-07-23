@@ -65,7 +65,6 @@ def avg_pool(value, ksize, stride, padding='SAME',
     else:
         raise ValueError("padding options must be 'SAME', 'VALID', int, tuple, or list.")
 
-
     out = np.zeros(out_shape, dtype=np.int64)
 
     value = np.pad(value, [(0, 0),

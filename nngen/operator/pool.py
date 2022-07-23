@@ -1076,19 +1076,6 @@ class _pool(bt._Operator):
 
         return ret
 
-    def gradient(self, input_var, propagated_gradient, dtype=None):
-        if self is input_var: return propagated_gradient
-
-        input = self.args[0]
-
-        method = self.get_deriv_method()
-        propagated_gradient = method(propagated_gradient,
-            stored_input = self.stored_input,
-            ksize=self.ksize[1:3], strides=self.strides[1:3], padding=self.padding, 
-            pg_dtype=dtype)
-
-        return input.gradient(input_var, propagated_gradient)
-
 
 class avg_pool(_pool):
 
