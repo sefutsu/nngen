@@ -4,4 +4,3 @@ from __future__ import division
 
 from .relu import relu
 from .matmul import matmul
-from .pool import avg_pool
