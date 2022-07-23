@@ -13,7 +13,7 @@ def avg_pool(value, ksize, stride, padding='SAME',
              dtype=None, sum_dtype=None, name=None, par=1,
              force_div=False,
              value_ram_size=None, out_ram_size=None,
-             value_dtype=None):
+             value_dtype=None, **kwargs):
 
     ksize_row = ksize[1]
     ksize_col = ksize[2]
@@ -120,7 +120,7 @@ def avg_pool(value, ksize, stride, padding='SAME',
 def max_pool(value, ksize, stride, padding='SAME',
              dtype=None, name=None, par=1,
              value_ram_size=None, out_ram_size=None,
-             value_dtype=None):
+             value_dtype=None, **kwargs):
 
     ksize_row = ksize[1]
     ksize_col = ksize[2]
