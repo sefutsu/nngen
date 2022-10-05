@@ -108,7 +108,10 @@ def matmul(propagated_gradient, a, b, deriv_by_a=True,
 
     # dynamic quantization
     max_absolute_value = np.abs(propagated_gradient).max()
-    highest_bit = np.floor(np.log2(max_absolute_value)).astype(np.int8)
+    if max_absolute_value:
+        highest_bit = np.floor(np.log2(max_absolute_value)).astype(np.int8)
+    else:
+        highest_bit = 0
     available_highest_bit = dtype.width - 2
     rshift = max(0, highest_bit - available_highest_bit)
     if rshift > 0:
