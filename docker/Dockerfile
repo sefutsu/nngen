@@ -9,7 +9,7 @@ RUN pip3 install -U pip
 RUN pip3 install jinja2 pyverilog veriloggen numpy onnx
 RUN pip3 install torch torchvision
 RUN pip3 install pytest pytest-pythonpath
-RUN mkdir /home/nngen/
+# RUN mkdir /home/nngen/
 WORKDIR "/home/nngen"
-RUN git clone https://github.com/NNgen/nngen.git
-RUN cd nngen && python3 setup.py install && cd ../
+# RUN git clone https://github.com/NNgen/nngen.git
+# RUN cd nngen && python3 setup.py install && cd ../
