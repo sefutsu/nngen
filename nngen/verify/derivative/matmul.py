@@ -31,14 +31,10 @@ def matmul(grad_output, a, b, deriv_by_a=True,
             new_scale[i] = scale[0]
         scale = new_scale
 
-
     if act_func is not None:
-        try:
-            activated_value = saved_tensors["activated_value"]
-        except KeyError:
-            raise ValueError("No input value of activation function")
+        input_of_act_func = saved_tensors[0]
         act_deriv_method = act_func.get_deriv_method()
-        grad_output = act_deriv_method(grad_output, activated_value)
+        grad_output = act_deriv_method(grad_output, input_of_act_func)
 
     if pg_dtype is None:
         pg_dtype = ng.int32
