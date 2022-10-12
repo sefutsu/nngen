@@ -7,7 +7,7 @@ import numpy as np
 import nngen.util as util
 
 
-def matmul(a, b, stored_input=None,
+def matmul(a, b, saved_tensors=None,
            bias=None, scale=None,
            transposed_a=False, transposed_b=True,
            rshift_mul=None, rshift_sum=None, rshift_out=None,
@@ -190,8 +190,8 @@ def matmul(a, b, stored_input=None,
     sum = np.right_shift(sum, rshift_out)
     sum = np.where(sum > p_th, p_th, np.where(sum < n_th, n_th, sum))
 
-    if stored_input is not None:
-        stored_input["activated_value"] = sum[:]
+    if saved_tensors is not None:
+        saved_tensors["activated_value"] = sum[:]
 
     c = act_op(sum)
 

@@ -8,7 +8,7 @@ import numpy as np
 import nngen as ng
 
 def matmul(propagated_gradient, a, b, deriv_by_a=True,
-        stored_input=None, scale=None,
+        saved_tensors=None, scale=None,
         transposed_a=False, transposed_b=False,
         rshift_mul=None, rshift_sum=None, rshift_aaa=None,
         a_dtype=None, b_dtype=None, scale_dtype=None, pg_dtype=None,
@@ -34,7 +34,7 @@ def matmul(propagated_gradient, a, b, deriv_by_a=True,
 
     if act_func is not None:
         try:
-            activated_value = stored_input["activated_value"]
+            activated_value = saved_tensors["activated_value"]
         except KeyError:
             raise ValueError("No input value of activation function")
         act_deriv_method = act_func.get_deriv_method()

@@ -436,7 +436,7 @@ class _Operator(_Numeric):
         self.cached_stream = False
         self.cached_control = False
 
-        self.stored_input = {}
+        self.saved_tensors = {}
 
     def attribute(self, par=None):
         if par is not None:

@@ -1068,7 +1068,7 @@ class _pool(bt._Operator):
         kwargs['name'] = self.name
         kwargs['par'] = self.par
         kwargs['value_dtype'] = self.args[0].dtype
-        kwargs['stored_input'] = self.stored_input
+        kwargs['saved_tensors'] = self.saved_tensors
 
         method = self.get_eval_method()
         ret = method(value, ksize, strides, **kwargs)

@@ -325,7 +325,7 @@ class matmul(conv2d.conv2d):
         kwargs['b_dtype'] = self.args[1].dtype
         kwargs['bias_dtype'] = self.args[self.args_dict['bias']].dtype if self.has_bias else None
         kwargs['scale_dtype'] = self.args[self.args_dict['scale']].dtype if self.has_scale else None
-        kwargs['stored_input'] = self.stored_input
+        kwargs['saved_tensors'] = self.saved_tensors
 
         method = self.get_eval_method()
         ret = method(input, filter, **kwargs)
@@ -354,7 +354,7 @@ class matmul(conv2d.conv2d):
         method = self.get_deriv_method()
         propagated_gradient = method(propagated_gradient, args[0], args[1], 
             deriv_by_a=True,
-            stored_input=self.stored_input,
+            saved_tensors=self.saved_tensors,
             transposed_a=self.transposed_a,
             transposed_b=self.transposed_b,
             scale=scale, scale_dtype=scale_dtype,
