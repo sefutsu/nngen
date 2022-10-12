@@ -7,7 +7,7 @@ from .. import matmul as matmul_forward
 import numpy as np
 import nngen as ng
 
-def matmul(propagated_gradient, a, b, deriv_by_a=True,
+def matmul(grad_output, a, b, deriv_by_a=True,
         saved_tensors=None, scale=None,
         transposed_a=False, transposed_b=False,
         rshift_mul=None, rshift_sum=None, rshift_aaa=None,
@@ -16,7 +16,7 @@ def matmul(propagated_gradient, a, b, deriv_by_a=True,
         act_func=None, dtype=None,
         **kwargs):
 
-    c_shape = propagated_gradient.shape
+    c_shape = grad_output.shape
     
     if scale is None:
         scale = np.ones([c_shape[-1]], dtype=np.int64)
@@ -38,7 +38,7 @@ def matmul(propagated_gradient, a, b, deriv_by_a=True,
         except KeyError:
             raise ValueError("No input value of activation function")
         act_deriv_method = act_func.get_deriv_method()
-        propagated_gradient = act_deriv_method(propagated_gradient, activated_value)
+        grad_output = act_deriv_method(grad_output, activated_value)
 
     if pg_dtype is None:
         pg_dtype = ng.int32
@@ -48,25 +48,25 @@ def matmul(propagated_gradient, a, b, deriv_by_a=True,
     scl_shift = min(pg_dtype.point, scl_point)
     shifted_scale = np.right_shift(scale, scl_shift)
 
-    propagated_gradient = propagated_gradient * shifted_scale[None]
+    grad_output = grad_output * shifted_scale[None]
 
     if deriv_by_a:
-        propagated_gradient = matmul_forward(propagated_gradient, b,
+        grad_output = matmul_forward(grad_output, b,
                     transposed_a=False, transposed_b=not transposed_b,
                     a_dtype=pg_dtype, b_dtype=b_dtype, dtype=ng.int64)
         if transposed_a:
-            propagated_gradient = propagated_gradient.transpose()
+            grad_output = grad_output.transpose()
         if dtype is None: dtype = a_dtype
     else:
-        propagated_gradient = matmul_forward(a, propagated_gradient,
+        grad_output = matmul_forward(a, grad_output,
                     transposed_a=not transposed_a, transposed_b=False,
                     a_dtype=a_dtype, b_dtype=pg_dtype, dtype=ng.int64)
         if transposed_b:
-            propagated_gradient = propagated_gradient.transpose()
+            grad_output = grad_output.transpose()
         if dtype is None: dtype = b_dtype
     if dtype is None: dtype = ng.int32
 
-    c_shape = propagated_gradient.shape
+    c_shape = grad_output.shape
     if rshift_mul is None:
         rshift_mul = np.zeros([c_shape[-1]], dtype=np.int64)
     elif not isinstance(rshift_mul, np.ndarray):
@@ -107,7 +107,7 @@ def matmul(propagated_gradient, a, b, deriv_by_a=True,
         rshift_aaa = new_rshift_out
 
     # dynamic quantization
-    max_absolute_value = np.abs(propagated_gradient).max()
+    max_absolute_value = np.abs(grad_output).max()
     if max_absolute_value:
         highest_bit = np.floor(np.log2(max_absolute_value)).astype(np.int8)
     else:
@@ -115,8 +115,8 @@ def matmul(propagated_gradient, a, b, deriv_by_a=True,
     available_highest_bit = dtype.width - 2
     rshift = max(0, highest_bit - available_highest_bit)
     if rshift > 0:
-        propagated_gradient += 1 << (rshift - 1)
-        propagated_gradient >>= rshift
+        grad_output += 1 << (rshift - 1)
+        grad_output >>= rshift
 
     p_th = (1 << (dtype.width - 1)) - 1
     if asymmetric_clip:
@@ -127,8 +127,8 @@ def matmul(propagated_gradient, a, b, deriv_by_a=True,
     p_th = p_th >> dtype.point
     n_th = n_th >> dtype.point
 
-    propagated_gradient = np.where(propagated_gradient > p_th, p_th, 
-        np.where(propagated_gradient < n_th, n_th, propagated_gradient))
+    grad_output = np.where(grad_output > p_th, p_th, 
+        np.where(grad_output < n_th, n_th, grad_output))
 
-    return propagated_gradient
+    return grad_output
     

@@ -333,8 +333,8 @@ class matmul(conv2d.conv2d):
 
         return ret
 
-    def gradient(self, input_var, propagated_gradient):
-        if self is input_var: return propagated_gradient
+    def gradient(self, input_var, grad_output):
+        if self is input_var: return grad_output
 
         input = self.args[0]
 
@@ -352,7 +352,7 @@ class matmul(conv2d.conv2d):
 
 
         method = self.get_deriv_method()
-        propagated_gradient = method(propagated_gradient, args[0], args[1], 
+        grad_output = method(grad_output, args[0], args[1], 
             deriv_by_a=True,
             saved_tensors=self.saved_tensors,
             transposed_a=self.transposed_a,
@@ -363,4 +363,4 @@ class matmul(conv2d.conv2d):
             pg_dtype=self.dtype, dtype=input.dtype,
             act_func=self.act_func)
 
-        return input.gradient(input_var, propagated_gradient)
+        return input.gradient(input_var, grad_output)

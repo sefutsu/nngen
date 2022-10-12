@@ -328,9 +328,9 @@ class _Numeric(_Node):
 
         return self.value
 
-    def gradient(self, input_var, propagated_gradient, **kwargs):
+    def gradient(self, input_var, grad_output, **kwargs):
         if self is input_var:
-            return propagated_gradient
+            return grad_output
         return None
 
 
