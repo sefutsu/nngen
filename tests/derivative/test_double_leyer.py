@@ -1,6 +1,6 @@
 from double_layer import *
 
-def test_single_layer():
+def test_double_layer():
     inputs = generate_inputs()
     weights = generate_weights()
 
