@@ -191,7 +191,7 @@ def matmul(a, b, saved_tensors=None,
     sum = np.where(sum > p_th, p_th, np.where(sum < n_th, n_th, sum))
 
     if saved_tensors is not None:
-        saved_tensors["activated_value"] = sum[:]
+        saved_tensors.append(sum[:])
 
     c = act_op(sum)
 
