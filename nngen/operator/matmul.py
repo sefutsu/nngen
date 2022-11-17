@@ -358,9 +358,8 @@ class matmul(conv2d.conv2d):
             transposed_a=self.transposed_a,
             transposed_b=self.transposed_b,
             scale=scale, scale_dtype=scale_dtype,
-            rshift_mul=rshift_mul, rshift_sum=rshift_sum, rshift_out=rshift_out,
             a_dtype=self.args[0].dtype, b_dtype=self.args[1].dtype,
-            pg_dtype=self.dtype, dtype=input.dtype,
+            dtype=input.dtype, mul_dtype=self.mul_dtype, sum_dtype=self.sum_dtype,
             act_func=self.act_func)
 
         return input.gradient(input_var, grad_output)
