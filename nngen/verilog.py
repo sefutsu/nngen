@@ -1332,17 +1332,17 @@ def make_addr_map(config, objs, saxi):
             src.set_default_global_addr(default_global_addr)
             src.set_default_local_addr(default_local_addr)
 
+            i = ('temporal storage (%s) %s.%s (size: %s)' %
+                    (obj.__class__.__name__, obj.name, src.name, size_str(space_size)))
+
+            global_mem_map[(default_global_addr + temporal_used,
+                    default_global_addr + temporal_used + space_size - 1)] = i
+
             local_index += 1
             temporal_used += space_size
 
     default_global_addr = storage_used
     global_addr_map[0] = default_global_addr
-
-    i = ('temporal storages (size: %s)' %
-         size_str(temporal_used))
-
-    global_mem_map[(default_global_addr,
-                    default_global_addr + temporal_used - 1)] = i
 
     if not config['use_map_ram']:
         map_regs[0].initval = default_global_addr
