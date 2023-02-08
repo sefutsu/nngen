@@ -101,49 +101,41 @@ def conv2d(visitor, node):
         scale_scale_factor = 1.0
         q_scale_value = None
 
-    if ((rshift_mul is None or isinstance(rshift_mul, int)) and
-        (rshift_sum is None or isinstance(rshift_sum, int)) and
-            (rshift_out is None or isinstance(rshift_out, int))):
+    init_rshift_out = max(math.ceil(math.log(np.mean(np.abs(q_filter_value)) * 2.0, 2)), 0)
+    if scale is not None:
+        init_rshift_out += max(math.ceil(math.log(np.mean(np.abs(q_scale_value)) * 2.0, 2)), 0)
 
-        init_rshift_out = max(math.ceil(math.log(np.mean(np.abs(q_filter_value)) * 2.0, 2)), 0)
-        if scale is not None:
-            init_rshift_out += max(math.ceil(math.log(np.mean(np.abs(q_scale_value)) * 2.0, 2)), 0)
+    q_rshift_mul, q_rshift_sum, q_rshift_out = find_optimal_rshift(
+        visitor, node, q_filter_value, q_bias_value, q_scale_value,
+        init_rshift_mul=0,
+        init_rshift_sum=0,
+        init_rshift_out=init_rshift_out)
 
-        q_rshift_mul, q_rshift_sum, q_rshift_out = find_optimal_rshift(
-            visitor, node, q_filter_value, q_bias_value, q_scale_value,
-            init_rshift_mul=0,
-            init_rshift_sum=0,
-            init_rshift_out=init_rshift_out)
+    total_rshift = 0
 
-        total_rshift = 0
+    if node.cshamt_mul is not None:
+        node.cshamt_mul += q_rshift_mul
+        total_rshift += node.cshamt_mul
+    elif q_rshift_mul > 0:
+        node.cshamt_mul = q_rshift_mul
+        total_rshift += node.cshamt_mul
 
-        if node.cshamt_mul is not None:
-            node.cshamt_mul += q_rshift_mul
-            total_rshift += node.cshamt_mul
-        elif q_rshift_mul > 0:
-            node.cshamt_mul = q_rshift_mul
-            total_rshift += node.cshamt_mul
+    if node.cshamt_sum is not None:
+        node.cshamt_sum += q_rshift_sum
+        total_rshift += node.cshamt_sum
+    elif q_rshift_sum > 0:
+        node.cshamt_sum = q_rshift_sum
+        total_rshift += node.cshamt_sum
 
-        if node.cshamt_sum is not None:
-            node.cshamt_sum += q_rshift_sum
-            total_rshift += node.cshamt_sum
-        elif q_rshift_sum > 0:
-            node.cshamt_sum = q_rshift_sum
-            total_rshift += node.cshamt_sum
+    if node.cshamt_out is not None:
+        node.cshamt_out += q_rshift_out
+        total_rshift += node.cshamt_out
+    elif q_rshift_out > 0:
+        node.cshamt_out = q_rshift_out
+        total_rshift += node.cshamt_out
 
-        if node.cshamt_out is not None:
-            node.cshamt_out += q_rshift_out
-            total_rshift += node.cshamt_out
-        elif q_rshift_out > 0:
-            node.cshamt_out = q_rshift_out
-            total_rshift += node.cshamt_out
-
-        node.scale_factor = (input.scale_factor * filter_scale_factor *
-                             scale_scale_factor / (2 ** total_rshift))
-
-    else:
-        node.scale_factor = (input.scale_factor * filter_scale_factor *
-                             scale_scale_factor)
+    node.scale_factor = (input.scale_factor * filter_scale_factor *
+                            scale_scale_factor / (2 ** total_rshift))
 
 
 def find_optimal_rshift(visitor, node, filter, bias, scale,
