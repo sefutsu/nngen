@@ -40,6 +40,7 @@ def valid(valid_func, inputs, labels):
     return total_cost, correct
 
 def report_accuracy(valid_func, epoch=None, cost=None):
+    global x0_valid_mnist, t0_valid_mnist, x9_valid_mnist, t9_valid_mnist
     if epoch is not None:
         print("Epoch:", epoch, end=", ")
     if cost is not None:
@@ -52,8 +53,8 @@ def report_accuracy(valid_func, epoch=None, cost=None):
 lr = 0.01
 
 def int_float():
+    global x_train_mnist, t_train_mnist
     start_time = time()
-
     for epoch in range(5):
         x_train_mnist, t_train_mnist = shuffle(x_train_mnist, t_train_mnist)
         train_cost = 0
@@ -69,8 +70,8 @@ def int_float():
     print("Elapsed Time: {:.3f} s".format(end_time - start_time))
 
 def float_float():
+    global x_train_mnist, t_train_mnist
     start_time = time()
-
     for epoch in range(5):
         x_train_mnist, t_train_mnist = shuffle(x_train_mnist, t_train_mnist)
         train_cost = 0
