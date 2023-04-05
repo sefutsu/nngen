@@ -14,8 +14,8 @@ if act_dtype.width > 8:
 else:
     act_scale_factor = int(round(2 ** (act_dtype.width - 1) * 0.5))
 
-input_layer_name = "input_layer"
-output_layer_name = "output_layer"
+input_layer_name = "l0"
+output_layer_name = "l3"
 
 input_scale_factors = {input_layer_name: act_scale_factor}
 input_means = {input_layer_name: mnist_mean * act_scale_factor}
