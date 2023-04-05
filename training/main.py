@@ -5,7 +5,7 @@ import numpy as np
 import nngen as ng
 from time import time
 
-from .trainer import Trainer
+from trainer import Trainer
 
 trainer = Trainer()
 

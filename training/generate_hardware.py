@@ -1,6 +1,6 @@
 import nngen as ng
-from .npng import PlaceHolder, Matmul
-from .common import input_layer_name, output_layer_name
+from npng import PlaceHolder, Matmul
+from common import input_layer_name, output_layer_name
 
 if __name__ == '__main__':
     l0 = PlaceHolder(784, input_layer_name)

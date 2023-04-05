@@ -1,6 +1,6 @@
-from .npng import PlaceHolder, Matmul, input_scale_factors, input_means, input_stds
-from .util import softmax, cost_func
-from .common import *
+from npng import PlaceHolder, Matmul, input_scale_factors, input_means, input_stds
+from util import softmax, cost_func
+from common import *
 
 # https://github.com/opencv/opencv/issues/14884#:~:text=Mar%2017%2C%202020-,I%20had%20a%20similar%20issue%20where,-I%20could%20import
 import cv2

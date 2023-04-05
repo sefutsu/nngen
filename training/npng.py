@@ -1,8 +1,8 @@
 import numpy as np
 import nngen as ng
 from pathlib import Path
-from .util import relu, deriv_relu, identity
-from .common import *
+from util import relu, deriv_relu, identity
+from common import *
 
 class Node:
     def __init__(self, shape, name, output_addr):
