@@ -64,7 +64,7 @@ def int_float():
             trainer.update_params(lr)
             trainer.sync_qunatize()
         train_cost /= len(x_train_mnist)
-        report_accuracy(epoch + 1, train_cost)
+        report_accuracy(trainer.valid_ng, epoch + 1, train_cost)
         
     end_time = time()
     print("Elapsed Time: {:.3f} s".format(end_time - start_time))
