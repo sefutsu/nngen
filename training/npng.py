@@ -28,8 +28,8 @@ class PlaceHolder(Node):
         return super().fetch_output_from_buffer(buf) / act_scale_factor
 
 class Matmul(Node):
-    def __init__(self, input_node, in_dim, out_dim, name, output_addr, act=True):
-        super().__init__((1, out_dim), name, output_addr=0)
+    def __init__(self, input_node, in_dim, out_dim, name, output_addr=0, act=True):
+        super().__init__((1, out_dim), name, output_addr)
 
         self.w = np.random.uniform(low=-0.08, high=0.08,
                                    size=(in_dim, out_dim)).astype(np.float32)
