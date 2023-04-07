@@ -10,7 +10,7 @@ import nngen as ng
 print("Using NNgen version", ng.__version__)
 
 from pynq import Overlay, allocate
-from ..pynq import nngen_ctrl as ngc
+import nngen_ctrl as ngc
 
 class Trainer:
     def __init__(self):
