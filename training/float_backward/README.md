@@ -1,5 +1,7 @@
 # NNgen with Software Training
 
+NNgenで生成した回路を使って順伝播を行い、CPU上で32bit floatによる逆伝播を行います。
+
 ## 実行手順
 KV260用のbitstream(`mlp.bit`, `mlp.hwh`)を用意しています。これを利用する場合には4から手順を開始してください。
 
