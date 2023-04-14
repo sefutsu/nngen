@@ -1,7 +1,7 @@
 import math
 
 from nngen import dtype_list
-from nngen.basic_types import same_shape
+from nngen.basic_types import same_shape, max_shape
 
 class _Numeric:
     def __init__(self, dtype=None, shape=None, name=None):
@@ -50,3 +50,23 @@ class _Operator(_Numeric):
 
         _Numeric.__init__(self, dtype=dtype, shape=shape, name=name)
         self.args = args
+
+class _StreamingOperator(_Operator):
+    def __init__(self, *args, **opts):
+        dtype = opts['dtype'] if 'dtype' in opts else None
+        shape = opts['shape'] if 'shape' in opts else None
+        name = opts['name'] if 'name' in opts else None
+
+        if shape is None:
+            shape = max_shape(*args)
+
+        _Operator.__init__(self, *args, dtype=dtype, shape=shape, name=name)
+
+class _ElementwiseOperator(_StreamingOperator):
+    pass
+
+class _ActFuncOperator(_ElementwiseOperator):
+    def get_act_func(self):
+        pass
+    def get_deriv_act_func(self):
+        pass

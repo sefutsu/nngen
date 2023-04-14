@@ -15,10 +15,7 @@ class matmul(bt._Operator):
         if transposed_b:
             b = basic.transpose(b)
 
-        self.transposed_a = a
-        self.transposed_b = b
-
-        shape = (transposed_a.shape[0], transposed_b.shape[1])
+        shape = (a.shape[0], b.shape[1])
         args = [a, b]
 
         if bias is not None:
@@ -44,3 +41,8 @@ class matmul(bt._Operator):
         bt._Operator.__init__(self, *args, dtype=dtype, shape=shape, name=name)
 
         self.act_func = act_func(self) if act_func is not None else None
+
+class relu(bt._ActFuncOperator):
+    def __init__(self, features, dtype=None, name=None):
+        shape = None
+        bt._ActFuncOperator.__init__(self, features, dtype=dtype, shape=shape, name=name)

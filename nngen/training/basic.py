@@ -12,6 +12,6 @@ class transpose(bt._Operator):
 
         self.transpose_perm = perm
 
-        shape = (a_shape[p] for p in perm)
+        shape = tuple(a_shape[p] for p in perm)
 
         bt._Operator.__init__(self, a, dtype=dtype, shape=shape, name=name)

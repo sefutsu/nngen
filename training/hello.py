@@ -38,54 +38,54 @@ batchsize = 1
 
 # input
 input_layer = ng.placeholder(dtype=act_dtype,
-                             shape=(batchsize, 32, 32, 3),  # N, H, W, C
+                             shape=(batchsize, 32),
                              name='input_layer')
 
 # layer 0: conv2d (with bias and scale (= batchnorm)), relu, max_pool
-w0 = ng.variable(dtype=weight_dtype,
-                 shape=(64, 3, 3, 3),  # Och, Ky, Kx, Ich
-                 name='w0')
-b0 = ng.variable(dtype=bias_dtype,
-                 shape=(w0.shape[0],), name='b0')
-s0 = ng.variable(dtype=scale_dtype,
-                 shape=(w0.shape[0],), name='s0')
+# w0 = ng.variable(dtype=weight_dtype,
+#                  shape=(64, 3, 3, 3),  # Och, Ky, Kx, Ich
+#                  name='w0')
+# b0 = ng.variable(dtype=bias_dtype,
+#                  shape=(w0.shape[0],), name='b0')
+# s0 = ng.variable(dtype=scale_dtype,
+#                  shape=(w0.shape[0],), name='s0')
 
-a0 = ng.conv2d(input_layer, w0,
-               strides=(1, 1, 1, 1),
-               bias=b0,
-               scale=s0,
-               act_func=ng.relu,
-               dtype=act_dtype,
-               sum_dtype=ng.int32)
+# a0 = ng.conv2d(input_layer, w0,
+#                strides=(1, 1, 1, 1),
+#                bias=b0,
+#                scale=s0,
+#                act_func=ng.relu,
+#                dtype=act_dtype,
+#                sum_dtype=ng.int32)
 
-a0p = ng.max_pool_serial(a0,
-                         ksize=(1, 2, 2, 1),
-                         strides=(1, 2, 2, 1))
+# a0p = ng.max_pool_serial(a0,
+#                          ksize=(1, 2, 2, 1),
+#                          strides=(1, 2, 2, 1))
 
-# layer 1: conv2d, relu, reshape
-w1 = ng.variable(weight_dtype,
-                 shape=(64, 3, 3, a0.shape[-1]),
-                 name='w1')
-b1 = ng.variable(bias_dtype,
-                 shape=(w1.shape[0],),
-                 name='b1')
-s1 = ng.variable(scale_dtype,
-                 shape=(w1.shape[0],),
-                 name='s1')
+# # layer 1: conv2d, relu, reshape
+# w1 = ng.variable(weight_dtype,
+#                  shape=(64, 3, 3, a0.shape[-1]),
+#                  name='w1')
+# b1 = ng.variable(bias_dtype,
+#                  shape=(w1.shape[0],),
+#                  name='b1')
+# s1 = ng.variable(scale_dtype,
+#                  shape=(w1.shape[0],),
+#                  name='s1')
 
-a1 = ng.conv2d(a0p, w1,
-               strides=(1, 1, 1, 1),
-               bias=b1,
-               scale=s1,
-               act_func=ng.relu,
-               dtype=act_dtype,
-               sum_dtype=ng.int32)
+# a1 = ng.conv2d(a0p, w1,
+#                strides=(1, 1, 1, 1),
+#                bias=b1,
+#                scale=s1,
+#                act_func=ng.relu,
+#                dtype=act_dtype,
+#                sum_dtype=ng.int32)
 
-a1r = ng.reshape(a1, [batchsize, -1])
+# a1r = ng.reshape(a1, [batchsize, -1])
 
 # layer 2: full-connection, relu
 w2 = ng.variable(weight_dtype,
-                 shape=(256, a1r.shape[-1]),
+                 shape=(64, input_layer.shape[-1]),
                  name='w2')
 b2 = ng.variable(bias_dtype,
                  shape=(w2.shape[0],),
@@ -94,13 +94,13 @@ s2 = ng.variable(scale_dtype,
                  shape=(w2.shape[0],),
                  name='s2')
 
-a2 = ng.matmul(a1r, w2,
+
+a2 = ng.matmul(input_layer, w2,
                bias=b2,
                scale=s2,
                transposed_b=True,
                act_func=ng.relu,
-               dtype=act_dtype,
-               sum_dtype=ng.int32)
+               dtype=act_dtype)
 
 # layer 3: full-connection, relu
 w3 = ng.variable(weight_dtype,
@@ -119,8 +119,7 @@ output_layer = ng.matmul(a2, w3,
                          scale=s3,
                          transposed_b=True,
                          name='output_layer',
-                         dtype=act_dtype,
-                         sum_dtype=ng.int32)
+                         dtype=act_dtype)
 
 
 # --------------------
