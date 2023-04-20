@@ -135,27 +135,27 @@ output_layer = ng.matmul(a2, w3,
 
 import numpy as np
 
-w0_value = np.random.normal(size=w0.length).reshape(w0.shape)
-w0_value = np.clip(w0_value, -3.0, 3.0)
-w0.set_value(w0_value)
+# w0_value = np.random.normal(size=w0.length).reshape(w0.shape)
+# w0_value = np.clip(w0_value, -3.0, 3.0)
+# w0.set_value(w0_value)
 
-b0_value = np.random.normal(size=b0.length).reshape(b0.shape)
-b0_value = np.clip(b0_value, -3.0, 3.0)
-b0.set_value(b0_value)
+# b0_value = np.random.normal(size=b0.length).reshape(b0.shape)
+# b0_value = np.clip(b0_value, -3.0, 3.0)
+# b0.set_value(b0_value)
 
-s0_value = np.ones(s0.shape)
-s0.set_value(s0_value)
+# s0_value = np.ones(s0.shape)
+# s0.set_value(s0_value)
 
-w1_value = np.random.normal(size=w1.length).reshape(w1.shape)
-w1_value = np.clip(w1_value, -3.0, 3.0)
-w1.set_value(w1_value)
+# w1_value = np.random.normal(size=w1.length).reshape(w1.shape)
+# w1_value = np.clip(w1_value, -3.0, 3.0)
+# w1.set_value(w1_value)
 
-b1_value = np.random.normal(size=b1.length).reshape(b1.shape)
-b1_value = np.clip(b1_value, -3.0, 3.0)
-b1.set_value(b1_value)
+# b1_value = np.random.normal(size=b1.length).reshape(b1.shape)
+# b1_value = np.clip(b1_value, -3.0, 3.0)
+# b1.set_value(b1_value)
 
-s1_value = np.ones(s1.shape)
-s1.set_value(s1_value)
+# s1_value = np.ones(s1.shape)
+# s1.set_value(s1_value)
 
 w2_value = np.random.normal(size=w2.length).reshape(w2.shape)
 w2_value = np.clip(w2_value, -3.0, 3.0)
@@ -193,44 +193,6 @@ else:
 input_scale_factors = {'input_layer': act_scale_factor}
 input_means = {'input_layer': imagenet_mean * act_scale_factor}
 input_stds = {'input_layer': imagenet_std * act_scale_factor}
-
-ng.quantize([output_layer], input_scale_factors, input_means, input_stds)
-
-
-# --------------------
-# (3) Assign hardware attributes
-# --------------------
-
-# conv2d, matmul
-# par_ich: parallelism in input-channel
-# par_och: parallelism in output-channel
-# par_col: parallelism in pixel column
-# par_row: parallelism in pixel row
-
-par_ich = 2
-par_och = 2
-
-a0.attribute(par_ich=par_ich, par_och=par_och)
-a1.attribute(par_ich=par_ich, par_och=par_och)
-a2.attribute(par_ich=par_ich, par_och=par_och)
-output_layer.attribute(par_ich=par_ich, par_och=par_och)
-
-# cshamt_out: right shift amount after applying bias/scale
-# If you assign integer weights by yourself to each tensor,
-# cshamt (constant shift amount) must be assigned to each operator.
-
-# a0.attribute(cshamt_out=weight_dtype.width + 1)
-# a1.attribute(cshamt_out=weight_dtype.width + 1)
-# a2.attribute(cshamt_out=weight_dtype.width + 1)
-# output_layer.attribute(cshamt_out=weight_dtype.width + 1)
-
-# max_pool
-# par: parallelism in in/out channel
-
-par = par_och
-
-a0p.attribute(par=par)
-
 
 # --------------------
 # (4) Verify the DNN model behavior by executing the NNgen dataflow as a software
