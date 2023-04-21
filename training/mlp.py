@@ -5,6 +5,7 @@ if generate_ip:
     import nngen as ng
 else:
     import nngen.training as ng
+    from trainer import Trainer
 
 
 act_dtype = ng.int8
@@ -42,7 +43,7 @@ if generate_ip:
 
     ng.to_ipxact([model], 'mlp', config={'maxi_datawidth': axi_datawidth})
 else:
-    trainer = ng.Trainer(model)
+    trainer = Trainer(model)
     trainer.load_address_info("address_info.txt")
     trainer.load_params("params.npz")
 
