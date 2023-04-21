@@ -66,7 +66,8 @@ class _ElementwiseOperator(_StreamingOperator):
     pass
 
 class _ActFuncOperator(_ElementwiseOperator):
-    def get_act_func(self):
-        pass
-    def get_deriv_act_func(self):
-        pass
+    def __init__(self, features, dtype=None, name=None):
+        if dtype is None:
+            dtype = features.dtype
+        shape = features.shape
+        _ElementwiseOperator.__init__(self, features, dtype=dtype, shape=shape, name=name)

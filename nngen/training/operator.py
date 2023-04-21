@@ -3,18 +3,28 @@ from collections import OrderedDict
 from . import basic_types as bt
 from . import basic
 
-class matmul(bt._Operator):
+def matmul(a, b, bias=None, scale=None,
+           transposed_a=False, transposed_b=False,
+           rshift_out=None,
+           act_func=None,
+           dtype=None, sum_dtype=None,
+           name=None):
+    if transposed_a:
+        a = basic.transpose(a)
+    if transposed_b:
+        b = basic.transpose(b)
+    res = _matmul(a, b, bias, scale, rshift_out, dtype=dtype, name=name)
+    if act_func:
+        return act_func(res, name=None if name is None else name + ".act")
+    else:
+        return res
+
+class _matmul(bt._Operator):
     def __init__(self, a, b, bias=None, scale=None,
-                transposed_a=False, transposed_b=False,
                 rshift_out=None,
-                act_func=None,
                 dtype=None,
                 name=None):
-        if transposed_a:
-            a = basic.transpose(a)
-        if transposed_b:
-            b = basic.transpose(b)
-
+        
         shape = (a.shape[0], b.shape[1])
         args = [a, b]
 
@@ -40,9 +50,9 @@ class matmul(bt._Operator):
 
         bt._Operator.__init__(self, *args, dtype=dtype, shape=shape, name=name)
 
-        self.act_func = act_func(self) if act_func is not None else None
 
 class relu(bt._ActFuncOperator):
-    def __init__(self, features, dtype=None, name=None):
-        shape = None
-        bt._ActFuncOperator.__init__(self, features, dtype=dtype, shape=shape, name=name)
+    def act_func(self, features):
+        pass
+    def deriv_act_func(self, features):
+        pass
