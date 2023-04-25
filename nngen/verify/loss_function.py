@@ -14,5 +14,7 @@ def cross_entropy_loss(weight, target, reduction='mean'):
         return loss.sum() / loss.size
     elif reduction == 'sum':
         return loss.sum()
-    else:
+    elif reduction == "none":
         return loss
+    else:
+        raise ValueError("reduction must be 'mean', 'sum' or 'none'")
