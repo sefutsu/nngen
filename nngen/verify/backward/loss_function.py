@@ -10,9 +10,7 @@ def cross_entropy_loss(ctx, grad, reduction='mean'):
 
     if reduction == 'mean':
         return delta / len(delta)
-    elif reduction == 'sum':
+    elif reduction == 'sum' or reduction == "none":
         return delta
-    elif reduction == "none":
-        raise NotImplementedError
     else:
         raise ValueError("reduction must be 'mean', 'sum' or 'none'")
