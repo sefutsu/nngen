@@ -11,7 +11,7 @@ def stochastic_rounding(array):
     ceil = rand < frac
     return (floor + ceil).astype(np.int64)
 
-def dynamic_quantize_from_float(array, dtype, scale_factor):
+def quantize_from_float(array, dtype, scale_factor):
     if dtype.signed:
         array_abs_max = np.max(np.abs(array))
         quantized_abs_max = (1 << (dtype.width - 1)) - 1
