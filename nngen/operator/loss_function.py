@@ -28,7 +28,9 @@ class cross_entropy_loss(bt._Operator):
         return ret
 
     def backward(self, grad, scale_factor):
-
+        self.grad = grad
+        self.grad_scale_factor = scale_factor
+        
         method = self.get_backward_method()
         delta = method(self.ctx, grad, self.reduction)
 
