@@ -13,6 +13,7 @@ import veriloggen.thread as vthread
 from veriloggen.optimizer import try_optimize as optimize
 
 from . import dtype_list
+from .training.util import Context
 
 
 # Object ID counter for object sorting key
@@ -92,6 +93,9 @@ class _Numeric(_Node):
         self.scale_factor = 1.0
         # remember applied permutation pattern for ONNX
         self.perm = None
+
+        # for backward
+        self.ctx = Context()
 
     def __str__(self):
         clsname = self.__class__.__name__
@@ -1141,6 +1145,13 @@ class _Operator(_Numeric):
 
         name = self.__class__.__name__
         method = getattr(verify, name, None)
+        return method
+
+    def get_backward_method(self):
+        import nngen.verify.backward as backward
+
+        name = self.__class__.__name__
+        method = getattr(backward, name, None)
         return method
 
     def get_max_arg_rank(self):
