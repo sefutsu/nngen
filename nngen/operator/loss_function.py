@@ -18,7 +18,6 @@ class cross_entropy_loss(bt._Operator):
         weight = self.args[0].eval(memo, input_dict)
         weight_scale_factor = self.args[0].scale_factor
         float_weight = weight.astype(self.dtype) * weight_scale_factor
-        
         target = self.args[1].eval(memo, input_dict).astype(self.dtype)
 
         method = self.get_eval_method()
@@ -30,7 +29,7 @@ class cross_entropy_loss(bt._Operator):
     def backward(self, grad, scale_factor):
         self.grad = grad
         self.grad_scale_factor = scale_factor
-        
+
         method = self.get_backward_method()
         delta = method(self.ctx, grad, self.reduction)
 
