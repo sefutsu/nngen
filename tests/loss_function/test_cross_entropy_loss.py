@@ -64,7 +64,7 @@ def test_forward():
         assert (abs(nngen_res - torch_res) < eps).all()
 
 def _test_backward(weight_dtype, eps):
-    reduction = ["mean"]
+    reduction = ["mean", "sum"]
     for r in reduction:
         weight = ng.placeholder(dtype=weight_dtype, shape=(batch_size, num_classes), name="weight")
         target = ng.placeholder(dtype=np.float32, shape=(batch_size, num_classes), name="target")
