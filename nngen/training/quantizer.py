@@ -7,7 +7,7 @@ import numpy as np
 def stochastic_rounding(array):
     floor = np.floor(array)
     frac = array - floor
-    rand = np.random.rand(array.shape)
+    rand = np.random.rand(*array.shape)
     ceil = rand < frac
     return (floor + ceil).astype(np.int64)
 

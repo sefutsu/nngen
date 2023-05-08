@@ -349,6 +349,9 @@ class _Storage(_Numeric):
 
         return _Numeric.eval(self, memo, input_dict, **kwargs)
 
+    def backward(self, grad, scale_factor):
+        self.grad = grad
+        self.grad_scale_factor = scale_factor
 
 class _Constant(_Storage):
 

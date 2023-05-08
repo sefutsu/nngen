@@ -7,9 +7,13 @@ import numpy as np
 from nngen.training import quantizer
 
 class cross_entropy_loss(bt._Operator):
-    def __init__(self, weight, target, reduction='mean', name=None):
-        bt._Operator.__init__(self, weight, target, dtype=np.float32, shape=weight.shape, name=name)
+    def __init__(self, weight, target, dtype=None, reduction='mean', name=None):
+        # `dtype` must be float
+        if dtype is None:
+            dtype = np.float32
+        bt._Operator.__init__(self, weight, target, dtype=dtype, shape=weight.shape, name=name)
         self.reduction = reduction
+        self.weight_dtype = weight.dtype
 
     def eval(self, memo, input_dict, **kwargs):
         if id(self) in memo:
@@ -33,5 +37,5 @@ class cross_entropy_loss(bt._Operator):
         method = self.get_backward_method()
         delta = method(self.ctx, grad, self.reduction)
 
-        delta, scale_factor = quantizer.quantize_from_float(delta, scale_factor)
+        delta, scale_factor = quantizer.quantize_from_float(delta, self.weight_dtype, scale_factor)
         self.args[0].backward(delta, scale_factor)
