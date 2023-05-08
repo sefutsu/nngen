@@ -53,10 +53,10 @@ def test_forward():
         weight_value = generate_int8_weight(batch_size, num_classes)
         target_value = generate_target(batch_size, num_classes)
         scale_factor = np.random.uniform(1e-3, 1)
-        weight_float_value = weight_value * scale_factor
+        weight_float_tensor = torch.tensor(weight_value * scale_factor)
         weight.scale_factor = scale_factor
 
-        torch_res = torch.nn.CrossEntropyLoss(reduction=r)(torch.tensor(weight_float_value), torch.tensor(target_value)).numpy()
+        torch_res = torch.nn.CrossEntropyLoss(reduction=r)(weight_float_tensor, torch.tensor(target_value)).numpy()
 
         celoss = ng.cross_entropy_loss(weight, target, reduction=r)
         nngen_res = ng.eval([celoss], weight=weight_value, target=target_value)[0]
