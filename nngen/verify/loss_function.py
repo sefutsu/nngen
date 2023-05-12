@@ -5,12 +5,13 @@ from __future__ import division
 import numpy as np
 
 def cross_entropy_loss(ctx, weight, target, reduction='mean'):
-    softmax = np.exp(weight)
-    softmax /= softmax.sum(axis=1, keepdims=True)
-    softmax = np.clip(softmax, 1e-10, None)
-    ctx.save_for_backward(softmax, target)
+    weight -= weight.max(axis=1, keepdims=True)
+    exp_sum = np.exp(weight).sum(axis=1, keepdims=True)
+    exp_sum = np.clip(exp_sum, 1e-10, None)
+    log_softmax = weight - np.log(exp_sum)
+    ctx.save_for_backward(np.exp(log_softmax), target)
 
-    loss = -(np.log(softmax) * target).sum(axis=1)
+    loss = -(log_softmax * target).sum(axis=1)
     if reduction == 'mean':
         return loss.sum() / loss.size
     elif reduction == 'sum':
