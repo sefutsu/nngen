@@ -37,5 +37,5 @@ class cross_entropy_loss(bt._Operator):
         method = self.get_backward_method()
         delta = method(self.ctx, grad, self.reduction)
 
-        delta, scale_factor = quantizer.quantize_from_float(delta, scale_factor, self.dtype, self.weight_dtype)
+        delta, scale_factor = quantizer.quantize_from_float(delta, scale_factor, self.weight_dtype)
         self.args[0].backward(delta, scale_factor)
