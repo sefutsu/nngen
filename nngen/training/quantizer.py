@@ -50,5 +50,5 @@ def quantize_from_float(array, scale_factor, to_dtype):
 
 def _max_bit_position(array):
     # 0-indexed from LSB
-    max_val = array.abs().max()
+    max_val = np.abs(array).max()
     return int(np.log2(max_val))
