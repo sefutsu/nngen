@@ -5,9 +5,10 @@ from __future__ import division
 import numpy as np
 
 import nngen.util as util
+from nngen.training.util import Context
 
 
-def matmul(a, b,
+def matmul(ctx, a, b,
            bias=None, scale=None,
            transposed_a=False, transposed_b=True,
            rshift_mul=None, rshift_sum=None, rshift_out=None,
@@ -24,6 +25,8 @@ def matmul(a, b,
            disable_keep_left=False,
            a_dtype=None, b_dtype=None,
            bias_dtype=None, scale_dtype=None):
+
+    ctx.save_for_backward(a, b)
 
     if transposed_a:
         a = a.transpose()
@@ -171,11 +174,6 @@ def matmul(a, b,
     else:
         my_matmul = my_matmul_by_multiply
 
-    if act_func is None:
-        def act_op(x): return x
-    else:
-        act_op = act_func.get_act_func()
-
     sum = my_matmul(a, b)
 
     sum = np.left_shift(sum, sum_shift)
@@ -189,6 +187,9 @@ def matmul(a, b,
     sum = np.right_shift(sum, rshift_out)
     sum = np.where(sum > p_th, p_th, np.where(sum < n_th, n_th, sum))
 
-    c = act_op(sum)
-
-    return c
+    if act_func is None:
+        return sum
+    else:
+        act_op = act_func.get_act_func()
+        ctx.act_func_ctx = Context()
+        return act_op(ctx.act_func_ctx, sum)

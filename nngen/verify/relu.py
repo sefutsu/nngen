@@ -5,8 +5,10 @@ from __future__ import division
 import numpy as np
 
 
-def relu(features, dtype=None, name=None, par=1,
+def relu(ctx, features, dtype=None, name=None, par=1,
          features_dtype=None):
+
+    ctx.save_for_backward(features)
 
     features_point = 0 if features_dtype is None else features_dtype.point
     out_point = 0 if dtype is None else dtype.point
