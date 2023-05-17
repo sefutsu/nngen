@@ -334,6 +334,7 @@ class matmul(conv2d.conv2d):
         return ret
 
     def backward(self, grad, scale_factor):
+        # Override to prevent non-bias arg from being mistaken for bias
         self.grad = grad
         self.grad_scale_factor = scale_factor
 
