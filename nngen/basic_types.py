@@ -340,13 +340,6 @@ class _Numeric(_Node):
         self.grad = grad
         self.grad_scale_factor = scale_factor
 
-        method = self.get_backward_method()
-        deltas = method(self.ctx, grad)
-
-        from nngen.training import quantizer
-        for arg, delta in zip(self.args, deltas):
-            arg.backward(*quantizer.quantize_from_int(delta, scale_factor, arg.dtype))
-
 
 class _Storage(_Numeric):
 
@@ -1193,6 +1186,16 @@ class _Operator(_Numeric):
 
         return ret
 
+    def backward(self, grad, scale_factor):
+        self.grad = grad
+        self.grad_scale_factor = scale_factor
+
+        method = self.get_backward_method()
+        deltas = method(self.ctx, grad)
+
+        from nngen.training import quantizer
+        for arg, delta in zip(self.args, deltas):
+            arg.backward(*quantizer.quantize_from_int(delta, scale_factor, arg.dtype))
 
 class _StreamingOperator(_Operator):
     input_chainable = True
