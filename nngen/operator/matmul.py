@@ -9,6 +9,7 @@ from veriloggen.optimizer import try_optimize as optimize
 import nngen.basic_types as bt
 from . import basic
 from . import conv2d
+from nngen.training import quantizer
 
 
 def to_shape_2d(shape):
@@ -327,7 +328,23 @@ class matmul(conv2d.conv2d):
         kwargs['scale_dtype'] = self.args[self.args_dict['scale']].dtype if self.has_scale else None
 
         method = self.get_eval_method()
-        ret = method(input, filter, **kwargs)
+        ret = method(self.ctx, input, filter, **kwargs)
         memo[id(self)] = ret
 
         return ret
+
+    def backward(self, grad, scale_factor):
+        self.grad = grad
+        self.grad_scale_factor = scale_factor
+
+        input = self.args[0]
+        filter = self.args[1]
+        bias = self.args[self.args_dict['bias']] if self.has_bias else None
+
+        method = self.get_backward_method()
+        delta_input, delta_filter, delta_bias = method(self.ctx, grad)
+
+        input.backward(*quantizer.quantize_from_int(delta_input, scale_factor, input.dtype))
+        filter.backward(*quantizer.quantize_from_int(delta_filter, scale_factor, filter.dtype))
+        if self.has_bias:
+            bias.backward(*quantizer.quantize_from_int(delta_bias, scale_factor, bias.dtype))

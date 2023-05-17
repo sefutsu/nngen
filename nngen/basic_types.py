@@ -335,6 +335,17 @@ class _Numeric(_Node):
             raise ValueError('no value is assigned.')
 
         return self.value
+    
+    def backward(self, grad, scale_factor):
+        self.grad = grad
+        self.grad_scale_factor = scale_factor
+
+        method = self.get_backward_method()
+        deltas = method(self.ctx, grad)
+
+        from nngen.training import quantizer
+        for arg, delta in zip(self.args, deltas):
+            arg.backward(*quantizer.quantize_from_int(delta, scale_factor, arg.dtype))
 
 
 class _Storage(_Numeric):
@@ -1177,7 +1188,7 @@ class _Operator(_Numeric):
         kwargs['par'] = self.par
 
         method = self.get_eval_method()
-        ret = method(*args, **kwargs)
+        ret = method(self.ctx, *args, **kwargs)
         memo[id(self)] = ret
 
         return ret
