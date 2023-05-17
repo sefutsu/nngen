@@ -19,11 +19,13 @@ def test_verify_forward():
         weight = generate_weight(batch_size, num_classes)
         target = generate_target(batch_size, num_classes)
 
-        torch_res = torch.nn.CrossEntropyLoss(reduction=r)(torch.tensor(weight), torch.tensor(target)).numpy()
+        torch_res = torch.nn.MSELoss(reduction=r)(torch.tensor(weight), torch.tensor(target)).numpy()
 
         ctx = Context()
-        nngen_res = verify.cross_entropy_loss(ctx, weight, target, reduction=r)
-        assert (abs(nngen_res - torch_res) < eps).all()
+        nngen_res = verify.mse_loss(ctx, weight, target, reduction=r)
+
+        relative_eps = eps * np.abs(torch_res).max()
+        assert (np.abs(nngen_res - torch_res) < relative_eps).all()
 
 def test_verify_backward():
     for r in reduction:
@@ -31,20 +33,21 @@ def test_verify_backward():
         target = generate_target(batch_size, num_classes)
 
         torch_weight = torch.tensor(weight, requires_grad=True)
-        celoss = torch.nn.CrossEntropyLoss(reduction=r)(torch_weight, torch.tensor(target))
+        celoss = torch.nn.MSELoss(reduction=r)(torch_weight, torch.tensor(target))
         if r == "none":
-            batch_weight = generate_weight(batch_size, 1)
-            celoss = torch.matmul(celoss, torch.tensor(batch_weight))
+            loss_weight = generate_weight(batch_size, num_classes)
+            celoss = (celoss * torch.tensor(loss_weight)).sum()
         else:
-            batch_weight = 1
+            loss_weight = 1
         celoss.backward()
         torch_res = torch_weight.grad.numpy()
 
         ctx = Context()
-        verify.cross_entropy_loss(ctx, weight, target, reduction=r)
-        nngen_res = backward.cross_entropy_loss(ctx, batch_weight, r)
+        verify.mse_loss(ctx, weight, target, reduction=r)
+        nngen_res = backward.mse_loss(ctx, loss_weight, r)
 
-        assert (abs(nngen_res - torch_res) < eps).all()
+        relative_eps = eps * np.abs(torch_res).max()
+        assert (np.abs(nngen_res - torch_res) < relative_eps).all()
 
 def test_forward():
     for r in reduction:
@@ -56,12 +59,13 @@ def test_forward():
         weight_float_tensor = torch.tensor(weight_value * scale_factor)
         weight.scale_factor = scale_factor
 
-        torch_res = torch.nn.CrossEntropyLoss(reduction=r)(weight_float_tensor, torch.tensor(target_value)).numpy()
+        torch_res = torch.nn.MSELoss(reduction=r)(weight_float_tensor, torch.tensor(target_value)).numpy()
 
-        celoss = ng.cross_entropy_loss(weight, target, reduction=r)
+        celoss = ng.mse_loss(weight, target, reduction=r)
         nngen_res = ng.eval([celoss], weight=weight_value, target=target_value)[0]
 
-        assert (abs(nngen_res - torch_res) < eps).all()
+        relative_eps = eps * np.abs(torch_res).max()
+        assert (np.abs(nngen_res - torch_res) < relative_eps).all()
 
 def _test_backward(weight_dtype, eps):
     reduction = ["mean", "sum"]
@@ -74,15 +78,16 @@ def _test_backward(weight_dtype, eps):
         weight_float_tensor = torch.tensor(weight_value * scale_factor, requires_grad=True)
         weight.scale_factor = scale_factor
 
-        torch.nn.CrossEntropyLoss(reduction=r)(weight_float_tensor, torch.tensor(target_value)).backward()
+        torch.nn.MSELoss(reduction=r)(weight_float_tensor, torch.tensor(target_value)).backward()
         torch_res = weight_float_tensor.grad.numpy()
 
-        celoss = ng.cross_entropy_loss(weight, target, reduction=r)
+        celoss = ng.mse_loss(weight, target, reduction=r)
         ng.eval([celoss], weight=weight_value, target=target_value)
         ng.backward([celoss])
         nngen_res = weight.grad.astype(np.float32) * weight.grad_scale_factor
-        
-        assert (abs(nngen_res - torch_res) < eps).all()
+
+        relative_eps = eps * np.abs(torch_res).max()
+        assert (np.abs(nngen_res - torch_res) < relative_eps).all()
 
 def test_backward_int8():
     _test_backward(ng.int8, 1e-2)

@@ -23,7 +23,9 @@ def test_verify_forward():
 
         ctx = Context()
         nngen_res = verify.cross_entropy_loss(ctx, weight, target, reduction=r)
-        assert (abs(nngen_res - torch_res) < eps).all()
+
+        relative_eps = eps * np.abs(torch_res).max()
+        assert (np.abs(nngen_res - torch_res) < relative_eps).all()
 
 def test_verify_backward():
     for r in reduction:
@@ -44,7 +46,8 @@ def test_verify_backward():
         verify.cross_entropy_loss(ctx, weight, target, reduction=r)
         nngen_res = backward.cross_entropy_loss(ctx, batch_weight, r)
 
-        assert (abs(nngen_res - torch_res) < eps).all()
+        relative_eps = eps * np.abs(torch_res).max()
+        assert (np.abs(nngen_res - torch_res) < relative_eps).all()
 
 def test_forward():
     for r in reduction:
@@ -61,7 +64,8 @@ def test_forward():
         celoss = ng.cross_entropy_loss(weight, target, reduction=r)
         nngen_res = ng.eval([celoss], weight=weight_value, target=target_value)[0]
 
-        assert (abs(nngen_res - torch_res) < eps).all()
+        relative_eps = eps * np.abs(torch_res).max()
+        assert (np.abs(nngen_res - torch_res) < relative_eps).all()
 
 def _test_backward(weight_dtype, eps):
     reduction = ["mean", "sum"]
@@ -82,7 +86,8 @@ def _test_backward(weight_dtype, eps):
         ng.backward([celoss])
         nngen_res = weight.grad.astype(np.float32) * weight.grad_scale_factor
         
-        assert (abs(nngen_res - torch_res) < eps).all()
+        relative_eps = eps * np.abs(torch_res).max()
+        assert (np.abs(nngen_res - torch_res) < relative_eps).all()
 
 def test_backward_int8():
     _test_backward(ng.int8, 1e-2)
