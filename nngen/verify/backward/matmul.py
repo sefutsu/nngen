@@ -12,5 +12,5 @@ def matmul(ctx, grad, act_func=None):
     a, b = ctx.saved_tensors
     grad_a = np.matmul(grad, b)
     grad_b = np.matmul(grad.T, a)
-    grad_bias = np.ones((a.shape[0],), dtype=np.int64)
+    grad_bias = np.ones((b.shape[0],), dtype=np.int64)
     return grad_a, grad_b, grad_bias
