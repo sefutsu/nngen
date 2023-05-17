@@ -2,16 +2,18 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import division
 
+import nngen as ng
 import nngen.basic_types as bt
 import numpy as np
 from nngen.training import quantizer
 
-class cross_entropy_loss(bt._Operator):
+class _loss_function(bt._Operator):
     def __init__(self, weight, target, dtype=None, reduction='mean', name=None):
         # `dtype` must be float
         if dtype is None:
             dtype = np.float32
-        bt._Operator.__init__(self, weight, target, dtype=dtype, shape=weight.shape, name=name)
+        shape = (weight.shape[0],) if reduction == 'none' else (1,)
+        bt._Operator.__init__(self, weight, target, dtype=dtype, shape=shape, name=name)
         self.reduction = reduction
         self.weight_dtype = weight.dtype
 
@@ -39,3 +41,8 @@ class cross_entropy_loss(bt._Operator):
 
         delta, scale_factor = quantizer.quantize_from_float(delta, scale_factor, self.weight_dtype)
         self.args[0].backward(delta, scale_factor)
+
+class cross_entropy_loss(_loss_function):
+    pass
+class mse_loss(_loss_function):
+    pass
