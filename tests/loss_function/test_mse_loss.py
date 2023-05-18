@@ -55,8 +55,8 @@ def test_forward():
         target = ng.placeholder(dtype=np.float32, shape=(batch_size, num_classes), name="target")
         weight_value = generate_int8_weight(batch_size, num_classes)
         target_value = generate_target(batch_size, num_classes)
-        scale_factor = np.random.uniform(1e-3, 1)
-        weight_float_tensor = torch.tensor(weight_value * scale_factor)
+        scale_factor = np.random.uniform(1, 1000)
+        weight_float_tensor = torch.tensor(weight_value / scale_factor)
         weight.scale_factor = scale_factor
 
         torch_res = torch.nn.MSELoss(reduction=r)(weight_float_tensor, torch.tensor(target_value)).numpy()
@@ -74,8 +74,8 @@ def _test_backward(weight_dtype, eps):
         target = ng.placeholder(dtype=np.float32, shape=(batch_size, num_classes), name="target")
         weight_value = generate_int8_weight(batch_size, num_classes)
         target_value = generate_target(batch_size, num_classes)
-        scale_factor = np.random.uniform(1e-3, 1)
-        weight_float_tensor = torch.tensor(weight_value * scale_factor, requires_grad=True)
+        scale_factor = np.random.uniform(1, 1000)
+        weight_float_tensor = torch.tensor(weight_value / scale_factor, requires_grad=True)
         weight.scale_factor = scale_factor
 
         torch.nn.MSELoss(reduction=r)(weight_float_tensor, torch.tensor(target_value)).backward()
@@ -84,7 +84,7 @@ def _test_backward(weight_dtype, eps):
         celoss = ng.mse_loss(weight, target, reduction=r)
         ng.eval([celoss], weight=weight_value, target=target_value)
         ng.backward([celoss])
-        nngen_res = weight.grad.astype(np.float32) * weight.grad_scale_factor
+        nngen_res = weight.grad.astype(np.float32) / weight.grad_scale_factor
 
         relative_eps = eps * np.abs(torch_res).max()
         assert (np.abs(nngen_res - torch_res) < relative_eps).all()
