@@ -1194,8 +1194,8 @@ class _Operator(_Numeric):
         deltas = method(self.ctx, grad)
 
         from nngen.training import quantizer
-        for arg, delta in zip(self.args, deltas):
-            arg.backward(*quantizer.quantize_from_int(delta, scale_factor, arg.dtype))
+        for arg, (delta, scale) in zip(self.args, deltas):
+            arg.backward(*quantizer.quantize_from_int(delta, scale_factor * scale, arg.dtype))
 
 class _StreamingOperator(_Operator):
     input_chainable = True

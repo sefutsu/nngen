@@ -212,4 +212,4 @@ def try_rshift(node, input, filter, bias, scale,
         del kwargs['par_row']
         del kwargs['concur_och']
 
-    return method(input, filter, **kwargs)
+    return method(node.ctx, input, filter, **kwargs)

@@ -334,18 +334,16 @@ class matmul(conv2d.conv2d):
         return ret
 
     def backward(self, grad, scale_factor):
-        # Override for when `args[2]` is not bias
+
         self.grad = grad
         self.grad_scale_factor = scale_factor
 
         input = self.args[0]
         filter = self.args[1]
-        bias = self.args[self.args_dict['bias']] if self.has_bias else None
+        args = [input, filter] + [self.args[self.args_dict['bias']]] if self.has_bias else []
 
         method = self.get_backward_method()
-        delta_input, delta_filter, delta_bias = method(self.ctx, grad)
+        deltas = method(self.ctx, grad, input.scale_factor, filter.scale_factor, self.act_func)
 
-        input.backward(*quantizer.quantize_from_int(delta_input, scale_factor, input.dtype))
-        filter.backward(*quantizer.quantize_from_int(delta_filter, scale_factor, filter.dtype))
-        if self.has_bias:
-            bias.backward(*quantizer.quantize_from_int(delta_bias, scale_factor, bias.dtype))
+        for arg, (delta, scale) in zip(args, deltas):
+            arg.backward(*quantizer.quantize_from_int(delta, scale_factor * scale, arg.dtype))
