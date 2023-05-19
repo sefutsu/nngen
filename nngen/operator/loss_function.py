@@ -8,11 +8,10 @@ import numpy as np
 from nngen.training import quantizer
 
 class _loss_function(bt._Operator):
-    def __init__(self, weight, target, dtype=None, reduction='mean', name=None):
+    def __init__(self, weight, target, shape, dtype=None, reduction='mean', name=None):
         # `dtype` must be float
         if dtype is None:
             dtype = np.float32
-        shape = (weight.shape[0],) if reduction == 'none' else (1,)
         bt._Operator.__init__(self, weight, target, dtype=dtype, shape=shape, name=name)
         self.reduction = reduction
         self.weight_dtype = weight.dtype
@@ -28,8 +27,8 @@ class _loss_function(bt._Operator):
 
         method = self.get_eval_method()
         ret = method(self.ctx, float_weight, target, self.reduction)
-        memo[id(self)] = ret
 
+        memo[id(self)] = ret
         return ret
 
     def backward(self, grad, scale_factor):
@@ -43,6 +42,11 @@ class _loss_function(bt._Operator):
         self.args[0].backward(delta, scale_factor)
 
 class cross_entropy_loss(_loss_function):
-    pass
+    def __init__(self, weight, target, dtype=None, reduction='mean', name=None):
+        shape = (weight.shape[0],) if reduction == 'none' else (1,)
+        _loss_function.__init__(self, weight, target, shape, dtype, reduction, name)
+
 class mse_loss(_loss_function):
-    pass
+    def __init__(self, weight, target, dtype=None, reduction='mean', name=None):
+        shape = weight.shape if reduction == 'none' else (1,)
+        _loss_function.__init__(self, weight, target, shape, dtype, reduction, name)
