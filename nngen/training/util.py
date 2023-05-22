@@ -4,6 +4,11 @@ from __future__ import division
 
 class Context:
     def __init__(self):
-        self.saved_tensors = []
+        self._saved_tensors = []
     def save_for_backward(self, *tensors):
-        self.saved_tensors = [tensor.copy() for tensor in tensors]
+        self._saved_tensors = [tensor.copy() for tensor in tensors]
+    @property
+    def saved_tensors(self):
+        if not self._saved_tensors:
+            raise ValueError("no saved tensors")
+        return self._saved_tensors
