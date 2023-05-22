@@ -8,7 +8,7 @@ import nngen.util as util
 from nngen.training.util import Context
 
 
-def matmul(ctx, a, b,
+def matmul(a, b,
            bias=None, scale=None,
            transposed_a=False, transposed_b=True,
            rshift_mul=None, rshift_sum=None, rshift_out=None,
@@ -24,9 +24,11 @@ def matmul(ctx, a, b,
            out_ram_size=None,
            disable_keep_left=False,
            a_dtype=None, b_dtype=None,
-           bias_dtype=None, scale_dtype=None):
+           bias_dtype=None, scale_dtype=None,
+           ctx=None):
 
-    ctx.save_for_backward(a, b)
+    if ctx:
+        ctx.save_for_backward(a, b)
 
     if transposed_a:
         a = a.transpose()
@@ -191,5 +193,8 @@ def matmul(ctx, a, b,
         return sum
     else:
         act_op = act_func.get_act_func()
-        ctx.act_func_ctx = Context()
-        return act_op(ctx.act_func_ctx, sum)
+        if ctx:
+            ctx.act_func_ctx = Context()
+            return act_op(sum, ctx=ctx.act_func_ctx)
+        else:
+            return act_op(sum)

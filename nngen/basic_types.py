@@ -1179,9 +1179,10 @@ class _Operator(_Numeric):
         kwargs['dtype'] = self.dtype
         kwargs['name'] = self.name
         kwargs['par'] = self.par
+        kwargs['ctx'] = self.ctx
 
         method = self.get_eval_method()
-        ret = method(self.ctx, *args, **kwargs)
+        ret = method(*args, **kwargs)
         memo[id(self)] = ret
 
         return ret

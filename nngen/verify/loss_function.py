@@ -4,12 +4,13 @@ from __future__ import division
 
 import numpy as np
 
-def cross_entropy_loss(ctx, weight, target, reduction='mean'):
+def cross_entropy_loss(weight, target, reduction='mean', ctx=None):
     weight -= weight.max(axis=1, keepdims=True)
     exp_sum = np.exp(weight).sum(axis=1, keepdims=True)
     exp_sum = np.clip(exp_sum, 1e-10, None)
     log_softmax = weight - np.log(exp_sum)
-    ctx.save_for_backward(np.exp(log_softmax) - target)
+    if ctx:
+        ctx.save_for_backward(np.exp(log_softmax) - target)
 
     loss = -(log_softmax * target).sum(axis=1)
     if reduction == 'mean':
@@ -21,9 +22,10 @@ def cross_entropy_loss(ctx, weight, target, reduction='mean'):
     else:
         raise ValueError("reduction must be 'mean', 'sum' or 'none'")
 
-def mse_loss(ctx, weight, target, reduction='maen'):
+def mse_loss(weight, target, reduction='maen', ctx=None):
     diff = weight - target
-    ctx.save_for_backward(diff)
+    if ctx:
+        ctx.save_for_backward(diff)
 
     loss = diff * diff
     if reduction == 'mean':

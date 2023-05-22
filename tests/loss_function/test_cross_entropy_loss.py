@@ -22,7 +22,7 @@ def test_verify_forward():
         torch_res = torch.nn.CrossEntropyLoss(reduction=r)(torch.tensor(weight), torch.tensor(target)).numpy()
 
         ctx = Context()
-        nngen_res = verify.cross_entropy_loss(ctx, weight, target, reduction=r)
+        nngen_res = verify.cross_entropy_loss(weight, target, reduction=r, ctx=ctx)
 
         relative_eps = eps * np.abs(torch_res).max()
         assert (np.abs(nngen_res - torch_res) < relative_eps).all()
@@ -43,7 +43,7 @@ def test_verify_backward():
         torch_res = torch_weight.grad.numpy()
 
         ctx = Context()
-        verify.cross_entropy_loss(ctx, weight, target, reduction=r)
+        verify.cross_entropy_loss(weight, target, reduction=r, ctx=ctx)
         nngen_res = backward.cross_entropy_loss(ctx, batch_weight, r)
 
         relative_eps = eps * np.abs(torch_res).max()

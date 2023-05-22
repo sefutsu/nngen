@@ -26,7 +26,7 @@ class _loss_function(bt._Operator):
         target = self.args[1].eval(memo, input_dict).astype(self.dtype)
 
         method = self.get_eval_method()
-        ret = method(self.ctx, float_weight, target, self.reduction)
+        ret = method(float_weight, target, self.reduction, ctx=self.ctx)
 
         memo[id(self)] = ret
         return ret

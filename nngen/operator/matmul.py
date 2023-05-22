@@ -326,9 +326,10 @@ class matmul(conv2d.conv2d):
         kwargs['b_dtype'] = self.args[1].dtype
         kwargs['bias_dtype'] = self.args[self.args_dict['bias']].dtype if self.has_bias else None
         kwargs['scale_dtype'] = self.args[self.args_dict['scale']].dtype if self.has_scale else None
+        kwargs['ctx'] = self.ctx
 
         method = self.get_eval_method()
-        ret = method(self.ctx, input, filter, **kwargs)
+        ret = method(input, filter, **kwargs)
         memo[id(self)] = ret
 
         return ret
