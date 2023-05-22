@@ -8,8 +8,7 @@ def matmul(ctx, grad, scale_a, scale_b, act_func=None):
     act_func_scale = 1
     if act_func:
         act_func_backward = act_func.get_backward_method()
-        act_func_delta, act_func_scale = act_func_backward(ctx.act_func_ctx)
-        grad *= act_func_delta
+        grad, act_func_scale = act_func_backward(ctx.act_func_ctx, grad)
     # transpose_a = False, transposed_b = True
     a, b = ctx.saved_tensors
     grad_a = np.matmul(grad, b), scale_b * act_func_scale

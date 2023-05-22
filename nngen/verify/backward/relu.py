@@ -4,6 +4,6 @@ from __future__ import division
 
 import numpy as np
 
-def relu(ctx):
+def relu(ctx, grad):
     x, = ctx.saved_tensors
-    return np.where(x > 0, np.ones_like(x, dtype=np.int64), np.zeros_like(x, dtype=np.int64)), 1
+    return np.where(x > 0, grad, np.zeros_like(grad, dtype=np.int64)), 1
