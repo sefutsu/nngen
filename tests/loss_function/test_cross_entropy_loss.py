@@ -70,10 +70,12 @@ def test_forward():
 def _test_backward(weight_dtype, eps):
     reduction = ["mean", "sum"]
     for r in reduction:
-        weight = ng.placeholder(dtype=weight_dtype, shape=(batch_size, num_classes), name="weight")
-        target = ng.placeholder(dtype=np.float32, shape=(batch_size, num_classes), name="target")
+        weight = ng.variable(dtype=weight_dtype, shape=(batch_size, num_classes), name="weight")
+        target = ng.variable(dtype=np.float32, shape=(batch_size, num_classes), name="target")
         weight_value = generate_int8_weight(batch_size, num_classes)
         target_value = generate_target(batch_size, num_classes)
+        weight.set_value(weight_value)
+        target.set_value(target_value)
         scale_factor = np.random.uniform(1, 1000)
         weight_float_tensor = torch.tensor(weight_value / scale_factor, requires_grad=True)
         weight.scale_factor = scale_factor
@@ -82,7 +84,7 @@ def _test_backward(weight_dtype, eps):
         torch_res = weight_float_tensor.grad.numpy()
 
         celoss = ng.cross_entropy_loss(weight, target, reduction=r)
-        ng.eval([celoss], weight=weight_value, target=target_value)
+        ng.eval([celoss])
         ng.backward([celoss])
         nngen_res = weight.grad.astype(np.float32) / weight.grad_scale_factor
         

@@ -335,9 +335,9 @@ class matmul(conv2d.conv2d):
         return ret
 
     def backward(self, grad, scale_factor):
-
-        self.grad = grad
-        self.grad_scale_factor = scale_factor
+        if self.requires_grad:
+            self.grad = grad
+            self.grad_scale_factor = scale_factor
 
         input = self.args[0]
         filter = self.args[1]

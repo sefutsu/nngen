@@ -96,6 +96,7 @@ class _Numeric(_Node):
 
         # for backward
         self.ctx = Context()
+        self.requires_grad = False
 
     def __str__(self):
         clsname = self.__class__.__name__
@@ -337,8 +338,9 @@ class _Numeric(_Node):
         return self.value
     
     def backward(self, grad, scale_factor):
-        self.grad = grad
-        self.grad_scale_factor = scale_factor
+        if self.requires_grad:
+            self.grad = grad
+            self.grad_scale_factor = scale_factor
 
 
 class _Storage(_Numeric):
@@ -352,10 +354,6 @@ class _Storage(_Numeric):
             return input_dict[self.name]
 
         return _Numeric.eval(self, memo, input_dict, **kwargs)
-
-    def backward(self, grad, scale_factor):
-        self.grad = grad
-        self.grad_scale_factor = scale_factor
 
 class _Constant(_Storage):
 
