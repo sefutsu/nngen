@@ -1,5 +1,6 @@
 from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
+from sklearn.datasets import fetch_openml
 
 import numpy as np
 import nngen as ng
@@ -10,16 +11,23 @@ from trainer import Trainer
 trainer = Trainer()
 
 # Training Data
-# 事前に学習データを0と1-9に分けてnpyで用意
-dataset_root = "/home/root/jupyter_notebooks/mnist/dataset/"
-x0_mnist = np.load(dataset_root + "x0_mnist.npy")
-t0_mnist = np.load(dataset_root + "t0_mnist.npy")
-x9_mnist = np.load(dataset_root + "x9_mnist.npy")
-t9_mnist = np.load(dataset_root + "t9_mnist.npy")
+mnist = fetch_openml('mnist_784')
+
+x_mnist = mnist.data.to_numpy().astype(float) / 255.
+t_mnist = mnist.target.to_numpy().astype(int)
+
+x0_mnist = x_mnist[t_mnist == 0]
+x9_mnist = x_mnist[t_mnist != 0]
+t0_mnist = t_mnist[t_mnist == 0]
+t9_mnist = t_mnist[t_mnist != 0]
+
+t0_mnist = np.eye(10)[t0_mnist]
+t9_mnist = np.eye(10)[t9_mnist]
 
 x0_train_mnist, x0_valid_mnist, t0_train_mnist, t0_valid_mnist = train_test_split(x0_mnist, t0_mnist, test_size=0.3)
 x9_train_mnist, x9_valid_mnist, t9_train_mnist, t9_valid_mnist = train_test_split(x9_mnist, t9_mnist, test_size=0.3)
 
+# Use 1000 data for train and validation
 x0_valid_mnist = x0_valid_mnist[:100]
 x9_valid_mnist = x9_valid_mnist[:900]
 t0_valid_mnist = t0_valid_mnist[:100]

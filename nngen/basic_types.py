@@ -335,6 +335,10 @@ class _Numeric(_Node):
             raise ValueError('no value is assigned.')
 
         return self.value
+    
+    def backward(self, grad, scale_factor):
+        self.grad = grad
+        self.grad_scale_factor = scale_factor
 
 
 class _Storage(_Numeric):
@@ -1175,6 +1179,7 @@ class _Operator(_Numeric):
         kwargs['dtype'] = self.dtype
         kwargs['name'] = self.name
         kwargs['par'] = self.par
+        kwargs['ctx'] = self.ctx
 
         method = self.get_eval_method()
         ret = method(*args, **kwargs)
@@ -1182,6 +1187,16 @@ class _Operator(_Numeric):
 
         return ret
 
+    def backward(self, grad, scale_factor):
+        self.grad = grad
+        self.grad_scale_factor = scale_factor
+
+        method = self.get_backward_method()
+        deltas = method(self.ctx, grad)
+
+        from nngen.training import quantizer
+        for arg, (delta, scale) in zip(self.args, deltas):
+            arg.backward(*quantizer.quantize_from_int(delta, scale_factor * scale, arg.dtype))
 
 class _StreamingOperator(_Operator):
     input_chainable = True

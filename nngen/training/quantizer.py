@@ -32,7 +32,7 @@ def quantize_from_int(array, scale_factor, to_dtype):
         vmax = (1 << to_dtype.width - 1) - 1
         vmin = 0
     shifted_array = np.clip(shifted_array, vmin, vmax)
-    shifted_scale_factor = scale_factor * 2 ** rshift_amount
+    shifted_scale_factor = scale_factor / 2 ** rshift_amount
 
     return shifted_array, shifted_scale_factor
 
@@ -45,10 +45,10 @@ def quantize_from_float(array, scale_factor, to_dtype):
         array_abs_max = np.max(array)
         quantized_abs_max = (1 << to_dtype.width) - 1
     array = stochastic_rounding_float(array / array_abs_max * quantized_abs_max)
-    scale_factor = scale_factor * array_abs_max / quantized_abs_max
+    scale_factor = scale_factor / array_abs_max * quantized_abs_max
     return array, scale_factor
 
 def _max_bit_position(array):
     # 0-indexed from LSB
-    max_val = array.abs().max()
+    max_val = np.abs(array).max()
     return int(np.log2(max_val))
