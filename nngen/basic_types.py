@@ -342,6 +342,12 @@ class _Numeric(_Node):
             self.grad = grad
             self.grad_scale_factor = scale_factor
 
+    def retain_grad(self, y=True):
+        if y:
+            self.requires_grad = True
+            self.updated_value = False
+        else:
+            self.requires_grad = False
 
 class _Storage(_Numeric):
 

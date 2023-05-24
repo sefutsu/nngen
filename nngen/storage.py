@@ -21,7 +21,7 @@ class variable(bt._Storage):
         bt._Storage.__init__(self,
                              dtype=dtype, shape=shape, name=name,
                              is_input=False)
-        self.requires_grad = True
+        self.retain_grad()
 
 
 class constant(bt._Constant):
