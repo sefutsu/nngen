@@ -12,6 +12,7 @@ def stochastic_rounding_float(array):
     return (floor + ceil).astype(np.int64)
 
 def stochastic_rounding_int_shift(array, rshift):
+    rshift = int(rshift)
     res = np.abs(array)
     frac = np.bitwise_and(array, (1 << rshift) - 1)
     res >>= rshift
