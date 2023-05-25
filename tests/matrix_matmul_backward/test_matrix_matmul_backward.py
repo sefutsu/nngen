@@ -37,7 +37,7 @@ def test_backward():
 
     xn = ng.placeholder(dtype=ng.int8, shape=x.shape, name=input_name)
     xni = np.round(x * act_scale_factor).astype(np.int64)
-    xn.requires_grad = True
+    xn.retain_grad()
     wn = ng.variable(dtype=ng.int8, shape=w.shape)
     wn.set_value(w)
     bn = ng.variable(dtype=ng.int32, shape=b.shape)
@@ -46,7 +46,7 @@ def test_backward():
     tn.set_value(t)
 
     an = ng.matmul(xn, wn, bn, transposed_a=False, transposed_b=True, dtype=ng.int8)
-    an.requires_grad = True
+    an.retain_grad()
     rn = ng.mse_loss(an, tn, reduction='sum')
     ng.quantize([an], input_scale_factors, input_means, input_stds)
     ng.eval([rn], **{input_name: xni})
@@ -74,7 +74,7 @@ def test_backward_with_relu():
     t = np.zeros((in_dim, out_dim), dtype=np.float64)
 
     xn = ng.placeholder(dtype=ng.int8, shape=x.shape, name=input_name)
-    xn.requires_grad = True
+    xn.retain_grad()
     xni = np.round(x * act_scale_factor).astype(np.int64)
     wn = ng.variable(dtype=ng.int8, shape=w.shape)
     wn.set_value(w)
@@ -84,7 +84,7 @@ def test_backward_with_relu():
     tn.set_value(t)
 
     an = ng.matmul(xn, wn, bn, transposed_a=False, transposed_b=True, dtype=ng.int8, act_func=ng.relu)
-    an.requires_grad = True
+    an.retain_grad()
     rn = ng.mse_loss(an, tn, reduction='sum')
     ng.quantize([an], input_scale_factors, input_means, input_stds)
     ng.eval([rn], **{input_name: xni})
