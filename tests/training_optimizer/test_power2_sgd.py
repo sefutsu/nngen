@@ -21,9 +21,9 @@ def test_update_value():
         assert a.value == [i + 1]
 
 shape = (3, 4)
-def test_niti_sgd():
+def test_fixed_bitwidth_sgd():
     a = ng.variable(dtype=ng.int8, shape=shape)
-    optimizer = optim.niti_sgd()
+    optimizer = optim.fixed_bitwidth_sgd()
     for mu in range(1, 6):
         optimizer.mu = mu
         a.grad = np.random.randint(-1000, 1000, shape)

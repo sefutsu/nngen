@@ -26,7 +26,7 @@ class _Optimizer:
         raise NotImplementedError()
 
 class power2_sgd(_Optimizer):
-    def __init__(self, lr, grad_bitwidth_low=1, grad_bitwidth_high=5):
+    def __init__(self, lr, grad_bitwidth_low=1, grad_bitwidth_high=6):
         _Optimizer.__init__(self)
         self.lr = lr
         self.grad_bitwidth_low = grad_bitwidth_low
@@ -44,7 +44,7 @@ class power2_sgd(_Optimizer):
         shifted_grad = quantizer.stochastic_rounding_int_shift(node.grad, grad_rshift)
         return shifted_grad
 
-class niti_sgd(_Optimizer):
+class fixed_bitwidth_sgd(_Optimizer):
     def __init__(self, mu=5):
         _Optimizer.__init__(self)
         self.mu = mu
