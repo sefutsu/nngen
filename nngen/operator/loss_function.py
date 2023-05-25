@@ -32,8 +32,9 @@ class _loss_function(bt._Operator):
         return ret
 
     def backward(self, grad, scale_factor):
-        self.grad = grad
-        self.grad_scale_factor = scale_factor
+        if self.requires_grad:
+            self.grad = grad
+            self.grad_scale_factor = scale_factor
 
         method = self.get_backward_method()
         delta = method(self.ctx, grad, self.reduction)

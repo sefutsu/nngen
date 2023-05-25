@@ -12,6 +12,7 @@ def stochastic_rounding_float(array):
     return (floor + ceil).astype(np.int64)
 
 def stochastic_rounding_int_shift(array, rshift):
+    rshift = int(rshift)
     res = np.abs(array)
     frac = np.bitwise_and(array, (1 << rshift) - 1)
     res >>= rshift
@@ -20,8 +21,8 @@ def stochastic_rounding_int_shift(array, rshift):
     return res * np.sign(array)
 
 def quantize_from_int(array, scale_factor, to_dtype):
-    max_bit_pos = _max_bit_position(array)
-    scaled_max_bit_pos = to_dtype.width - 1 - to_dtype.signed
+    max_bit_pos = bit_width(array)
+    scaled_max_bit_pos = to_dtype.width - to_dtype.signed
     rshift_amount = max(0, max_bit_pos - scaled_max_bit_pos)
 
     shifted_array = stochastic_rounding_int_shift(array, rshift_amount)
@@ -48,7 +49,6 @@ def quantize_from_float(array, scale_factor, to_dtype):
     scale_factor = scale_factor / array_abs_max * quantized_abs_max
     return array, scale_factor
 
-def _max_bit_position(array):
-    # 0-indexed from LSB
+def bit_width(array):
     max_val = np.abs(array).max()
-    return int(np.log2(max_val))
+    return int(np.log2(max_val) + 1)
