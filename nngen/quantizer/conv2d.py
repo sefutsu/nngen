@@ -119,7 +119,7 @@ def conv2d(visitor, node):
     elif q_rshift_mul > 0:
         node.cshamt_mul = q_rshift_mul
         total_rshift += node.cshamt_mul
-    if node.vshamt_mul is not None and node.cshamt_mul is not None:
+    if node.has_vshamt_mul and node.cshamt_mul is not None:
         node.vshamt_mul.set_value(node.cshamt_mul)
         node.cshamt_mul = 0
 
@@ -129,7 +129,7 @@ def conv2d(visitor, node):
     elif q_rshift_sum > 0:
         node.cshamt_sum = q_rshift_sum
         total_rshift += node.cshamt_sum
-    if node.vshamt_sum is not None and node.cshamt_sum is not None:
+    if node.has_vsham_sum and node.cshamt_sum is not None:
         node.vshamt_sum.set_value(node.cshamt_sum)
         node.cshamt_sum = 0
 
@@ -139,7 +139,7 @@ def conv2d(visitor, node):
     elif q_rshift_out > 0:
         node.cshamt_out = q_rshift_out
         total_rshift += node.cshamt_out
-    if node.vshamt_out is not None and node.cshamt_out is not None:
+    if node.has_vshamt_out and node.cshamt_out is not None:
         node.vshamt_out.set_value(node.cshamt_out)
         node.cshamt_out = 0
 
