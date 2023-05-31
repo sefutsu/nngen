@@ -129,7 +129,7 @@ def conv2d(visitor, node):
     elif q_rshift_sum > 0:
         node.cshamt_sum = q_rshift_sum
         total_rshift += node.cshamt_sum
-    if node.has_vsham_sum and node.cshamt_sum is not None:
+    if node.has_vshamt_sum and node.cshamt_sum is not None:
         node.vshamt_sum.set_value(node.cshamt_sum)
         node.cshamt_sum = 0
 
