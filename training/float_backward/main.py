@@ -1,10 +1,9 @@
-from sklearn.utils import shuffle
-from sklearn.model_selection import train_test_split
-from sklearn.datasets import fetch_openml
-
-import numpy as np
-import nngen as ng
 from time import time
+import numpy as np
+from sklearn.utils import shuffle
+
+import nngen as ng
+print(ng.__version__)
 
 from trainer import Trainer
 
