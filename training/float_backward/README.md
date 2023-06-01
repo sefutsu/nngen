@@ -9,3 +9,11 @@ KV260用のbitstream(`mlp.bit`, `mlp.hwh`)を用意しています。これを�
 2. https://www.acri.c.titech.ac.jp/wordpress/archives/5576 などを参考にbitstreamを生成する
 3. PYNQ環境にbitstreamをアップロードする
 4. PYNQ上で`python main.py`を実行する
+
+## 必要パッケージ
+- pynq
+- scikit-learn
+- pandas
+
+## Tips
+PYNQの環境によってはJupyter Notebookから実行したほうがうまくいくことがあるみたいです。`main.ipynb`も置いておきます。
