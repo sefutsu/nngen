@@ -62,8 +62,6 @@ class Matmul(Node):
         self.b_ng.quantized = False
         self.s_ng.quantized = False
         self.out_ng.quantized = False
-#         self.vshamt_ng.quantized = False
-#         self.out_ng.cshamt_out = 0
 
     def forward_np(self, feed_dict):
         self.x = self.input_node.forward_np(feed_dict)

@@ -119,6 +119,9 @@ def conv2d(visitor, node):
     elif q_rshift_mul > 0:
         node.cshamt_mul = q_rshift_mul
         total_rshift += node.cshamt_mul
+    if node.has_vshamt_mul and node.cshamt_mul is not None:
+        node.args[node.args_dict['vshamt_mul']].set_value([node.cshamt_mul])
+        node.cshamt_mul = 0
 
     if node.cshamt_sum is not None:
         node.cshamt_sum += q_rshift_sum
@@ -126,6 +129,9 @@ def conv2d(visitor, node):
     elif q_rshift_sum > 0:
         node.cshamt_sum = q_rshift_sum
         total_rshift += node.cshamt_sum
+    if node.has_vshamt_sum and node.cshamt_sum is not None:
+        node.args[node.args_dict['vshamt_sum']].set_value([node.cshamt_sum])
+        node.cshamt_sum = 0
 
     if node.cshamt_out is not None:
         node.cshamt_out += q_rshift_out
@@ -133,6 +139,9 @@ def conv2d(visitor, node):
     elif q_rshift_out > 0:
         node.cshamt_out = q_rshift_out
         total_rshift += node.cshamt_out
+    if node.has_vshamt_out and node.cshamt_out is not None:
+        node.args[node.args_dict['vshamt_out']].set_value([node.cshamt_out])
+        node.cshamt_out = 0
 
     node.scale_factor = (input.scale_factor * filter_scale_factor *
                             scale_scale_factor / (2 ** total_rshift))
