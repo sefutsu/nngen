@@ -1,11 +1,6 @@
 import sys
-
-generate_ip = sys.argv[-1] == "-ip"
-if generate_ip:
-    import nngen as ng
-else:
-    import nngen.training as ng
-    from trainer import Trainer
+import nngen as ng
+    
 
 
 act_dtype = ng.int8
@@ -32,6 +27,7 @@ l2 = Matmul(l1, 100, 100, "l2", ng.relu)
 l3 = Matmul(l2, 100, 10, output_layer_name)
 model = l3
 
+generate_ip = sys.argv[-1] == "-ip"
 if generate_ip:
     par_ich = 2
     par_och = 2
@@ -43,6 +39,8 @@ if generate_ip:
 
     ng.to_ipxact([model], 'mlp', config={'maxi_datawidth': axi_datawidth})
 else:
+    from trainer import Trainer
+
     trainer = Trainer(model)
     trainer.load_address_info("address_info.txt")
     trainer.load_params("params.npz")

@@ -20,3 +20,4 @@ from .slice_ import slice_
 from .upsampling2d import upsampling2d
 from .pad import pad
 from .normalize import *
+from .loss_function import cross_entropy_loss, mse_loss

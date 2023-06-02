@@ -13,6 +13,7 @@ import veriloggen.thread as vthread
 from veriloggen.optimizer import try_optimize as optimize
 
 from . import dtype_list
+from .training.util import Context
 
 
 # Object ID counter for object sorting key
@@ -92,6 +93,10 @@ class _Numeric(_Node):
         self.scale_factor = 1.0
         # remember applied permutation pattern for ONNX
         self.perm = None
+
+        # for backward
+        self.ctx = Context()
+        self.requires_grad = False
 
     def __str__(self):
         clsname = self.__class__.__name__
@@ -331,7 +336,14 @@ class _Numeric(_Node):
             raise ValueError('no value is assigned.')
 
         return self.value
+    
+    def backward(self, grad, scale_factor):
+        if self.requires_grad:
+            self.grad = grad
+            self.grad_scale_factor = scale_factor
 
+    def retain_grad(self, y=True):
+        self.requires_grad = y
 
 class _Storage(_Numeric):
 
@@ -344,7 +356,6 @@ class _Storage(_Numeric):
             return input_dict[self.name]
 
         return _Numeric.eval(self, memo, input_dict, **kwargs)
-
 
 class _Constant(_Storage):
 
@@ -1143,6 +1154,13 @@ class _Operator(_Numeric):
         method = getattr(verify, name, None)
         return method
 
+    def get_backward_method(self):
+        import nngen.verify.backward as backward
+
+        name = self.__class__.__name__
+        method = getattr(backward, name, None)
+        return method
+
     def get_max_arg_rank(self):
         max_rank = max(list(self.shared_attrs['_rank'].values()))
         return max_rank
@@ -1161,6 +1179,7 @@ class _Operator(_Numeric):
         kwargs['dtype'] = self.dtype
         kwargs['name'] = self.name
         kwargs['par'] = self.par
+        kwargs['ctx'] = self.ctx
 
         method = self.get_eval_method()
         ret = method(*args, **kwargs)
@@ -1168,6 +1187,16 @@ class _Operator(_Numeric):
 
         return ret
 
+    def backward(self, grad, scale_factor):
+        self.grad = grad
+        self.grad_scale_factor = scale_factor
+
+        method = self.get_backward_method()
+        deltas = method(self.ctx, grad)
+
+        from nngen.training import quantizer
+        for arg, (delta, scale) in zip(self.args, deltas):
+            arg.backward(*quantizer.quantize_from_int(delta, scale_factor * scale, arg.dtype))
 
 class _StreamingOperator(_Operator):
     input_chainable = True

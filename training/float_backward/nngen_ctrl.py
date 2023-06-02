@@ -1,1 +1,1 @@
-../pynq/nngen_ctrl.py
+../../pynq/nngen_ctrl.py

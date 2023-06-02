@@ -15,8 +15,8 @@ class Trainer:
         self.global_buffer = allocate(shape=(global_buffer_size,), dtype=np.uint8)
         self.ip.set_global_buffer(self.global_buffer)
 
-    def read_global_buffer(self, addr_begin, length):
-        return self.global_buffer[addr_begin:addr_begin+length].view(np.int8)
+    def read_global_buffer(self, addr_begin, length, dtype):
+        return self.global_buffer[addr_begin:addr_begin+length].view(dtype)
 
     def write_global_buffer(self, addr_begin, length, value):
         # TODO: boundary check
