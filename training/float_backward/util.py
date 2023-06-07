@@ -36,3 +36,11 @@ def identity(x):
 
 def cost_func(x, y, t):
     return (- t * np_log(y)).sum(axis=1).mean()
+
+def cross_entropy(weight, target):
+    weight -= weight.max(axis=1, keepdims=True)
+    exp_sum = np.exp(weight).sum(axis=1, keepdims=True)
+    exp_sum = np.clip(exp_sum, 1e-10, None)
+    log_softmax = weight - np.log(exp_sum)
+    loss = -(log_softmax * target).sum(axis=1)
+    return loss.sum() / loss.size
