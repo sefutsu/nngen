@@ -12,3 +12,6 @@ class Context:
         if not self._saved_tensors:
             raise ValueError("no saved tensors")
         return self._saved_tensors
+
+def set_with_default(value, default):
+    return default if value is None else value
