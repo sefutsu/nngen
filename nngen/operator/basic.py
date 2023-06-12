@@ -1200,3 +1200,11 @@ class transpose(bt._Operator):
         memo[id(self)] = ret
 
         return ret
+
+    @property
+    def value(self):
+        return self.args[0].value
+    @value.setter
+    def value(self, v):
+        if v is not None:
+            self.args[0].value = v
